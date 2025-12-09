@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>{{ username }} • CosaNostra BlackLink</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        font-family: "Inter", sans-serif;
+        text-align: center;
+    }
+
+    .container {
+        max-width: 450px;
+        margin: auto;
+        padding: 30px 20px;
+    }
+
+    .avatar {
+        width: 110px;
+        height: 110px;
+        border-radius: 100px;
+        margin: 20px auto;
+        border: 3px solid #f1d17d;
+        object-fit: cover;
+    }
+
+    .title {
+        font-family: "Playfair Display", serif;
+        font-size: 32px;
+        margin-bottom: 5px;
+        color: #f1d17d;
+    }
+
+    .subtitle {
+        font-size: 16px;
+        color: #bbb;
+        margin-bottom: 35px;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        margin-bottom: 15px;
+        text-decoration: none;
+        border-radius: 10px;
+        border: 2px solid #f1d17d;
+        color: #f1d17d;
+        font-size: 18px;
+        transition: 0.25s;
+    }
+
+    .btn:hover {
+        background: #f1d17d;
+        color: #000;
+    }
+
+    .produto-box {
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 40px;
+    }
+
+    .produto-title {
+        font-family: "Playfair Display", serif;
+        font-size: 24px;
+        color: #f1d17d;
+        margin-bottom: 10px;
+    }
+
+    .produto-img {
+        width: 85%;
+        border-radius: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .produto-price {
+        font-size: 22px;
+        font-weight: 700;
+        color: #f1d17d;
+        margin-bottom: 15px;
+    }
+
+    .produto-btn {
+        background: #f1d17d;
+        color: #000;
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 19px;
+        font-weight: bold;
+        display: block;
+        text-decoration: none;
+        transition: 0.25s;
+        border: none;
+    }
+
+    .produto-btn:hover {
+        opacity: 0.85;
+    }
+
+    footer {
+        margin-top: 45px;
+        padding: 20px;
+        font-size: 13px;
+        color: #666;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <img class="avatar" src="https://i.imgur.com/wjYh6kB.png">
+
+    <div class="title">{{ username }}</div>
+
+    <div class="subtitle">
+        Meu hub profissional. Minimalista. Dominante.
+    </div>
+
+    <a class="btn" href="https://www.instagram.com/cosanostra.ai/">Instagram</a>
+    <a class="btn" href="https://www.tiktok.com/@cosanostra.ia">TikTok</a>
+    <a class="btn" href="https://www.youtube.com/@CosaNostraAI">YouTube</a>
+    <a class="btn" href="https://www.linkedin.com/in/felipe-projetoscosanostra/">LinkedIn</a>
+
+    <div class="produto-box">
+        <div class="produto-title" id="produto-title">🔥 Destaque do Dia</div>
+
+        <img class="produto-img" id="produto-img" src="" alt="Produto em destaque" style="display:none;">
+
+        <div class="produto-price" id="produto-price">Carregando...</div>
+
+        <a class="produto-btn" id="produto-link" href="#" target="_blank" style="display:none;">
+            COMPRAR AGORA
+        </a>
+    </div>
+
+</div>
+
+<footer>
+    Criado com CosaNostra BlackLink Premium — 2025
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch("http://localhost:8000/api/product-of-the-day/");
+        if (!res.ok) {
+            throw new Error("Falha ao carregar produto do dia");
+        }
+        const data = await res.json();
+
+        const titleEl = document.getElementById("produto-title");
+        const priceEl = document.getElementById("produto-price");
+        const imgEl = document.getElementById("produto-img");
+        const linkEl = document.getElementById("produto-link");
+
+        titleEl.textContent = "🔥 " + data.name;
+        priceEl.textContent = data.price || "";
+        if (data.image_url) {
+            imgEl.src = data.image_url;
+            imgEl.style.display = "block";
+        }
+        if (data.link) {
+            linkEl.href = data.link;
+            linkEl.style.display = "block";
+        }
+    } catch (e) {
+        const priceEl = document.getElementById("produto-price");
+        priceEl.textContent = "Não foi possível carregar o produto.";
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+/* ======= GLOBAL ======= */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    font-family: 'Playfair Display', serif;
+    color: #fff;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+/* Fade suave ao entrar */
+body {
+    animation: fadeIn 1.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+    max-width: 420px;
+    margin: 70px auto;
+    padding: 20px;
+}
+
+/* ======= TÍTULOS ======= */
+
+.title {
+    font-size: 50px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    background: linear-gradient(180deg, #ffffff 0%, #d7d7d7 100%);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.subtitle {
+    font-size: 20px;
+    opacity: 0.85;
+    margin-bottom: 50px;
+}
+
+/* ======= BOTÕES BLACK/GOLD ======= */
+
+.btn {
+    display: block;
+    width: 80%;
+    margin: 12px auto;
+    padding: 14px 20px;
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    text-decoration: none;
+    font-size: 20px;
+    border-radius: 10px;
+    transition: 0.25s ease-in-out;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.15);
+}
+
+/* Efeito hover gold */
+.btn:hover {
+    background: #d4af37;
+    color: #000;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 16px rgba(212, 175, 55, 0.35);
+}
+
+/* ======= CTA PREMIUM ======= */
+
+.cta {
+    background: #d4af37;
+    color: #000;
+    font-weight: 700;
+    margin-top: 40px;
+}
+
+/* Brilho suave no CTA */
+.cta:hover {
+    background: #ffce3d;
+    box-shadow: 0 0 25px #d4af37;
+}
+
+/* ======= FOOTER ======= */
+
+footer {
+    margin-top: 50px;
+    opacity: 0.45;
+    font-size: 15px;
+}

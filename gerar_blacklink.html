@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gerar Meu BlackLink • CosaNostra AI</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        background: #000;
+        color: #fff;
+        font-family: "Inter", sans-serif;
+        text-align: center;
+    }
+
+    header {
+        padding: 40px 20px;
+    }
+
+    h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 42px;
+        color: #f1d17d;
+    }
+
+    .subtitle {
+        font-size: 18px;
+        color: #ccc;
+        max-width: 650px;
+        margin: 10px auto 40px auto;
+    }
+
+    .pricing-container {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 25px;
+        padding: 30px 20px;
+    }
+
+    .plan {
+        width: 300px;
+        border: 1px solid #444;
+        padding: 25px;
+        border-radius: 12px;
+        background: #0b0b0b;
+        transition: 0.3s;
+    }
+
+    .plan:hover {
+        transform: scale(1.03);
+        border-color: #f1d17d;
+    }
+
+    .plan h2 {
+        font-family: "Playfair Display";
+        font-size: 26px;
+        margin-bottom: 10px;
+        color: #fff;
+    }
+
+    .price {
+        font-size: 28px;
+        margin: 20px 0;
+        font-weight: 700;
+        color: #f1d17d;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 15px 0;
+        line-height: 28px;
+        color: #ddd;
+        font-size: 16px;
+    }
+
+    .btn {
+        margin-top: 20px;
+        display: block;
+        padding: 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-free {
+        background: transparent;
+        border: 2px solid #ccc;
+        color: #ccc;
+    }
+    .btn-free:hover {
+        background: #ccc;
+        color: #000;
+    }
+
+    .btn-premium {
+        background: #f1d17d;
+        color: #000;
+    }
+    .btn-premium:hover {
+        opacity: 0.85;
+    }
+
+    .btn-black {
+        background: linear-gradient(90deg, #8b0000, #550000);
+        color: #fff;
+        border: 1px solid #aa0000;
+    }
+    .btn-black:hover {
+        background: linear-gradient(90deg, #aa0000, #330000);
+    }
+
+    footer {
+        padding: 35px;
+        color: #666;
+        font-size: 14px;
+        margin-top: 60px;
+    }
+
+    .generator-box {
+        margin-top: 60px;
+    }
+
+    input {
+        width: 300px;
+        padding: 12px;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    #result-link {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #f1d17d;
+        font-weight: bold;
+    }
+</style>
+
+</head>
+<body>
+
+<header>
+    <h1>Gerar Meu BlackLink</h1>
+
+    <p class="subtitle">
+        Transforme sua presença digital com um link único, profissional e dominante.<br>
+        Escolha um plano abaixo e crie seu próprio <b>CosaNostra BlackLink</b> em segundos.
+    </p>
+</header>
+
+<section class="pricing-container">
+
+    <div class="plan">
+        <h2>Plano FREE</h2>
+        <div class="price">R$ 0/mês</div>
+        <ul>
+            <li>1 Tema disponível</li>
+            <li>Até 5 links</li>
+            <li>Sem página de produtos</li>
+            <li>Sem estatísticas</li>
+        </ul>
+        <a class="btn btn-free" href="#gerador" onclick="setPlano('free')">Criar agora</a>
+    </div>
+
+    <div class="plan">
+        <h2>Premium</h2>
+        <div class="price">R$ 19/mês</div>
+        <ul>
+            <li>3 Temas premium</li>
+            <li>Links ilimitados</li>
+            <li>Página de produto automática</li>
+            <li>Suporte padrão</li>
+        </ul>
+        <a class="btn btn-premium" href="#gerador" onclick="setPlano('premium')">Começar</a>
+    </div>
+
+    <div class="plan">
+        <h2>Black Division</h2>
+        <div class="price">R$ 49/mês</div>
+        <ul>
+            <li>Tema exclusivo</li>
+            <li>Pixel de anúncios</li>
+            <li>Estatísticas avançadas</li>
+            <li>Suporte VIP</li>
+        </ul>
+        <a class="btn btn-black" href="#gerador" onclick="setPlano('black')">Entrar na Família</a>
+    </div>
+
+</section>
+
+<section id="gerador" class="generator-box">
+    <h2 style="font-family:Playfair Display; color:#f1d17d;">Gerar Meu Link Agora</h2>
+    <p>Escolha seu nome de usuário:</p>
+
+    <input type="text" id="username" placeholder="ex: felipeoficial">
+    <br>
+
+    <button onclick="gerarLink()" class="btn btn-premium" style="width: 300px;">
+        Gerar BlackLink
+    </button>
+
+    <div id="result-link"></div>
+</section>
+
+<footer>
+    © 2025 • CosaNostra Black Division
+</footer>
+
+<script>
+let planoSelecionado = "free";
+
+function setPlano(plano) {
+    planoSelecionado = plano;
+}
+
+async function gerarLink() {
+    const username = document.getElementById("username").value.trim().toLowerCase();
+
+    if (!username) {
+        alert("Digite um nome de usuário.");
+        return;
+    }
+
+    const theme =
+        planoSelecionado === "free" ? "corleone" :
+        planoSelecionado === "premium" ? "ghost" :
+        "viper";
+
+    const payload = {
+        username: username,
+        theme: theme
+    };
+
+    const res = await fetch("http://localhost:8000/api/blacklinks/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+
+    const area = document.getElementById("result-link");
+
+    if (!res.ok) {
+        const err = await res.json();
+        area.innerHTML = "❌ Erro: " + (err.detail || "não foi possível criar o link");
+        return;
+    }
+
+    const data = await res.json();
+    const finalUrl = "/users/" + data.username + "/";
+
+    area.innerHTML =
+        "🔗 Seu BlackLink foi criado:<br><br>" +
+        "<a href='" + finalUrl + "' target='_blank' style='color:#f1d17d;'>" +
+        window.location.origin + finalUrl +
+        "</a>";
+}
+</script>
+
+</body>
+</html>

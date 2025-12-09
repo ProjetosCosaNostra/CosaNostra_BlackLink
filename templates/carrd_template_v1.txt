@@ -1,0 +1,13 @@
+﻿# CARRD TEMPLATE - COSANOSTRA BLACKLINK
+Titulo: CosaNostra BlackLink
+Cores: Preto (#000) + Dourado (#D4AF37)
+Fonte: Playfair Display
+
+[SEÇÕES]
+- Links principais
+- CTA de conversão
+- Bloco de autoridade
+- Rodapé minimalista
+
+Instruções:
+Copiar e colar no Carrd.

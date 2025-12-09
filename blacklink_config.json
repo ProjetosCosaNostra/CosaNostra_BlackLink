@@ -1,0 +1,7 @@
+﻿{
+    "project_name": "CosaNostra BlackLink",
+    "version": "1.0",
+    "author": "CosaNostra",
+    "theme": "black_gold",
+    "deploy_target": "Carrd"
+}
