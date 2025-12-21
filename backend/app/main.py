@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 # ==================================================
 # DATABASE
 # ==================================================
-from app.database import ensure_sqlite_schema
+from app.database import engine, ensure_sqlite_schema
 
 # ==================================================
 # SETTINGS
@@ -54,7 +54,7 @@ app.add_middleware(
 )
 
 # ==================================================
-# ROUTERS (imports diretos, sem depender do __init__.py exportar nomes)
+# ROUTERS (IMPORTAÇÃO DIRETA — SEM __init__.py)
 # ==================================================
 import app.routers.auth as auth
 import app.routers.product as product
@@ -63,20 +63,18 @@ import app.routers.catalog as catalog
 import app.routers.admin as admin
 import app.routers.panel as panel
 import app.routers.payment as payment
-
-# Alguns projetos têm plan.py, outros não (pra não derrubar deploy)
-try:
-    import app.routers.plan as plan  # type: ignore
-    _HAS_PLAN = True
-except Exception as e:
-    logger.warning(f"⚠️ Router plan indisponível: {e}")
-    _HAS_PLAN = False
-
-# Webhook (obrigatório)
 import app.routers.webhook as webhook
 
+# Router de plano é opcional (não pode derrubar deploy)
+try:
+    import app.routers.plan as plan  # type: ignore
+    HAS_PLAN = True
+except Exception as e:
+    logger.warning(f"⚠️ Router plan indisponível: {e}")
+    HAS_PLAN = False
+
 # ==================================================
-# ROUTERS (registro)
+# ROUTERS (REGISTRO)
 # ==================================================
 app.include_router(auth.router, tags=["Auth"])
 app.include_router(product.router, tags=["Product"])
@@ -86,11 +84,10 @@ app.include_router(admin.router, tags=["Admin"])
 app.include_router(panel.router, tags=["Panel"])
 app.include_router(payment.router, tags=["Payment"])
 
-if _HAS_PLAN:
+if HAS_PLAN:
     app.include_router(plan.router, tags=["Plan"])
 
-# ✅ WEBHOOK: o router já tem prefix="/webhook" dentro do webhook.py
-# então aqui entra SEM prefix extra
+# Webhook JÁ tem prefix="/webhook" no próprio router
 app.include_router(webhook.router, tags=["Webhook"])
 
 # ==================================================
@@ -99,8 +96,8 @@ app.include_router(webhook.router, tags=["Webhook"])
 @app.on_event("startup")
 def on_startup():
     logger.info("🚀 Iniciando CosaNostra BlackLink")
-    ensure_sqlite_schema()
-    logger.info("✅ Banco de dados pronto")
+    ensure_sqlite_schema(engine)  # 🔥 ESSENCIAL
+    logger.info("✅ Banco de dados validado")
 
 # ==================================================
 # HEALTHCHECK
