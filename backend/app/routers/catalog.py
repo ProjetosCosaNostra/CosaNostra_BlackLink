@@ -105,7 +105,8 @@ def _base_queryset_products(
     direction: str,
 ):
     query = db.query(models.BlackLinkProduct).filter(
-        models.BlackLinkProduct.owner_id == owner_id
+        models.BlackLinkProduct.owner_id == owner_id,
+        models.BlackLinkProduct.is_active == 1
     )
 
     if q:
@@ -127,10 +128,10 @@ def _base_queryset_products(
 def _product_to_viewmodel(product: models.BlackLinkProduct) -> dict:
     return {
         "id": product.id,
-        "name": product.title,
+        "title": product.title,                    # 🔥 alinhado ao template
         "price": _parse_price_from_badge(product.badge),
         "image_url": _safe_image_url(product),
-        "link": product.url or "",
+        "url": product.url or "",
     }
 
 
@@ -161,14 +162,17 @@ def user_products_page(
     alive_products = [p for p in products_db if _is_link_alive(p.url or "")]
     products_vm = [_product_to_viewmodel(p) for p in alive_products]
 
+    # 🔥 CONTEXT COMPLETO (ESSENCIAL PARA O TEMPLATE)
     context = {
         "request": request,
         "username": user.username,
+        "user": user,                    # ✅ AGORA O PLANO FUNCIONA
         "products": products_vm,
         "q": q or "",
         "order_by": order_by,
         "direction": direction,
     }
+
     return templates.TemplateResponse("user_products.html", context)
 
 
@@ -209,6 +213,7 @@ def product_detail_page(
         .filter(
             models.BlackLinkProduct.owner_id == user.id,
             models.BlackLinkProduct.id != product_id,
+            models.BlackLinkProduct.is_active == 1,
         )
         .order_by(models.BlackLinkProduct.id.desc())
         .all()
@@ -223,9 +228,11 @@ def product_detail_page(
     context = {
         "request": request,
         "username": user.username,
+        "user": user,
         "product": product_vm,
         "others": others_vm,
     }
+
     return templates.TemplateResponse("product_detail.html", context)
 
 

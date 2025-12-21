@@ -127,6 +127,132 @@
             color: var(--accent-strong);
         }
 
+        /* ================================
+           PASSO 3 — PLANO / UPGRADE (NOVO)
+           ================================ */
+
+        .plan-strip {
+            margin: 10px auto 0;
+            max-width: 920px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: radial-gradient(circle at top left,
+                        rgba(252, 176, 69, 0.16),
+                        rgba(2, 1, 11, 0.92));
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+            padding: 14px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .plan-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 240px;
+        }
+
+        .plan-title {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .plan-title strong {
+            color: var(--accent-strong);
+        }
+
+        .plan-sub {
+            font-size: 12px;
+            color: var(--text-soft);
+        }
+
+        .plan-right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .plan-chip {
+            padding: 7px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.86);
+            white-space: nowrap;
+        }
+
+        .plan-chip strong { color: var(--accent-strong); }
+
+        .plan-cta {
+            border-radius: var(--radius-pill);
+            border: none;
+            padding: 9px 18px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: linear-gradient(135deg, #f97316, #fcb045);
+            color: #18141f;
+            cursor: pointer;
+            box-shadow: 0 14px 32px rgba(249, 115, 22, 0.40);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .plan-cta.ghost {
+            background: transparent;
+            color: var(--accent-strong);
+            border: 1px solid rgba(252, 176, 69, 0.45);
+            box-shadow: none;
+        }
+
+        .upgrade-banner {
+            margin: 14px auto 0;
+            max-width: 920px;
+            border-radius: 22px;
+            padding: 16px 18px;
+            border: 1px solid rgba(252, 176, 69, 0.28);
+            background: linear-gradient(135deg,
+                    rgba(252, 176, 69, 0.14),
+                    rgba(4, 4, 20, 0.92));
+        }
+
+        .upgrade-banner h3 {
+            margin: 0 0 6px;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent-strong);
+        }
+
+        .upgrade-banner p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--text-soft);
+            line-height: 1.5;
+        }
+
+        .upgrade-actions {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
         /* BARRA DE BUSCA / FILTROS */
 
         .toolbar {
@@ -455,6 +581,15 @@
             .cta-row {
                 flex-direction: column;
             }
+
+            .plan-strip {
+                padding: 14px 14px;
+            }
+
+            .plan-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
         }
     </style>
 </head>
@@ -478,6 +613,77 @@
                 <strong>BlackLink Ultra Premium</strong>.
             </span>
         </div>
+
+        <!-- ================================
+             PASSO 3 — PLANO / CONTADOR (NOVO)
+             ================================ -->
+        <div class="plan-strip">
+            <div class="plan-left">
+                <div class="plan-title">
+                    Plano atual: <strong>{{ user.plan.upper() }}</strong>
+                </div>
+                <div class="plan-sub">
+                    {% if user.plan == "free" %}
+                        Você pode cadastrar até <strong>3</strong> produtos no FREE.
+                    {% elif user.plan == "pro" %}
+                        Você pode cadastrar até <strong>20</strong> produtos no PRO.
+                    {% else %}
+                        Produtos <strong>ilimitados</strong> no DON.
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="plan-right">
+                <div class="plan-chip">
+                    <strong>{{ products|length }}</strong>
+                    {% if user.plan == "free" %}
+                        / 3 usados
+                    {% elif user.plan == "pro" %}
+                        / 20 usados
+                    {% else %}
+                        • ilimitado
+                    {% endif %}
+                </div>
+
+                {% if user.plan == "free" %}
+                    <a class="plan-cta" href="/checkout?plan=pro">Upgrade PRO</a>
+                    <a class="plan-cta ghost" href="/checkout?plan=don">Upgrade DON</a>
+                {% elif user.plan == "pro" %}
+                    <a class="plan-cta" href="/checkout?plan=don">Upgrade DON</a>
+                {% else %}
+                    <span class="plan-chip">Ultra Premium • Don</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ================================
+             PASSO 3 — ALERTA DE LIMITE (NOVO)
+             ================================ -->
+        {% if user.plan == "free" and products|length >= 3 %}
+            <div class="upgrade-banner">
+                <h3>Limite do plano FREE atingido</h3>
+                <p>
+                    Você já utiliza todos os <strong>3 produtos</strong> do FREE.
+                    Faça upgrade para o <strong>PRO</strong> e libere até <strong>20 produtos</strong>
+                    (ou vá direto para o <strong>DON</strong> e tenha produtos ilimitados).
+                </p>
+                <div class="upgrade-actions">
+                    <a class="plan-cta" href="/checkout?plan=pro">Upgrade PRO</a>
+                    <a class="plan-cta ghost" href="/checkout?plan=don">Upgrade DON</a>
+                </div>
+            </div>
+        {% elif user.plan == "pro" and products|length >= 20 %}
+            <div class="upgrade-banner">
+                <h3>Plano PRO no limite</h3>
+                <p>
+                    Você atingiu o limite de <strong>20 produtos</strong>.
+                    O plano <strong>DON</strong> libera produtos ilimitados e recursos exclusivos.
+                </p>
+                <div class="upgrade-actions">
+                    <a class="plan-cta" href="/checkout?plan=don">Upgrade DON</a>
+                </div>
+            </div>
+        {% endif %}
     </header>
 
     <form method="get" class="toolbar">
@@ -524,11 +730,11 @@
                     <div class="tag-destino">Destino BlackLink</div>
 
                     <div class="thumb-wrap">
-                        <img src="{{ p.image_url }}" alt="{{ p.name }}" class="thumb" />
+                        <img src="{{ p.image_url }}" alt="{{ p.title }}" class="thumb" />
                     </div>
 
-                    <div class="name">{{ p.name }}</div>
-                    <div class="price">R$ {{ p.price }}</div>
+                    <div class="name">{{ p.title }}</div>
+                    <div class="price">{{ p.price }}</div>
                     <div class="subcopy">
                         Oferta selecionada. Clique em <strong>Comprar direto</strong> para ir ao anúncio oficial
                         ou em <strong>Ver detalhes</strong> para ver a vitrine completa.

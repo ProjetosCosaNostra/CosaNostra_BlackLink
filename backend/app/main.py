@@ -19,13 +19,12 @@ logger = logging.getLogger("blacklink")
 # ==================================================
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
-
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # ==================================================
 # DATABASE
 # ==================================================
-from app.database import ensure_sqlite_schema
+from app.database import engine, ensure_sqlite_schema
 
 # ==================================================
 # SETTINGS
@@ -55,19 +54,17 @@ app.add_middleware(
 )
 
 # ==================================================
-# ROUTERS (IMPORTAÇÃO EXPLÍCITA)
+# ROUTERS (IMPORT SEGURO — NÃO DEPENDE DO __init__.py)
 # ==================================================
-from app.routers import (
-    auth,
-    product,
-    blacklinks,
-    catalog,
-    admin,
-    panel,
-    payment,
-    plan,
-    webhook,
-)
+import app.routers.auth as auth
+import app.routers.product as product
+import app.routers.blacklinks as blacklinks
+import app.routers.catalog as catalog
+import app.routers.admin as admin
+import app.routers.panel as panel
+import app.routers.payment as payment
+import app.routers.plan as plan
+import app.routers.webhook as webhook
 
 # ==================================================
 # ROUTERS (REGISTRO)
@@ -81,9 +78,8 @@ app.include_router(panel.router, tags=["Panel"])
 app.include_router(payment.router, tags=["Payment"])
 app.include_router(plan.router, tags=["Plan"])
 
-# ✅ IMPORTANTE:
-# O router do webhook JÁ tem prefix="/webhook" dentro do arquivo webhook.py
-# então aqui NÃO coloque prefix novamente.
+# Webhook router já tem prefix="/webhook" dentro dele.
+# Aqui NÃO coloca prefix, pra não virar /webhook/webhook/...
 app.include_router(webhook.router, tags=["Webhook"])
 
 # ==================================================
@@ -92,7 +88,7 @@ app.include_router(webhook.router, tags=["Webhook"])
 @app.on_event("startup")
 def on_startup():
     logger.info("🚀 Iniciando CosaNostra BlackLink")
-    ensure_sqlite_schema()
+    ensure_sqlite_schema(engine)
     logger.info("✅ Banco de dados pronto")
 
 # ==================================================

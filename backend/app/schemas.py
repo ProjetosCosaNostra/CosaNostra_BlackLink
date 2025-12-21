@@ -6,6 +6,9 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 
+# ============================================================
+# PRODUCTS
+# ============================================================
 class ProductBase(BaseModel):
     title: str
     description: Optional[str] = None
@@ -47,6 +50,9 @@ class ProductOut(ProductBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+# ============================================================
+# USERS
+# ============================================================
 class UserBase(BaseModel):
     username: str
     display_name: Optional[str] = None
@@ -71,7 +77,7 @@ class UserBase(BaseModel):
 
     plan: Optional[str] = "free"
 
-    # PASSO 3 — aqui é OUTPUT e ORM, então tem que ser datetime
+    # STATUS DE PLANO — sempre datetime real (ORM-safe)
     plan_status: Optional[str] = "active"
     plan_started_at: Optional[datetime] = None
     plan_expires_at: Optional[datetime] = None
@@ -81,7 +87,8 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     """
-    Entrada pode mandar datetime em ISO também — pydantic converte pra datetime automaticamente.
+    Entrada pode mandar datetime em ISO.
+    Pydantic converte automaticamente.
     """
     pass
 
@@ -120,17 +127,30 @@ class UserOut(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
 
+# ============================================================
+# ADMIN / INGEST
+# ============================================================
 class AdminIngestRequest(BaseModel):
     username: str
     ml_url: str
     featured: int = 1
 
 
+# ============================================================
+# PAYMENTS (PRODUÇÃO-SAFE)
+# ============================================================
 class PaymentProcessRequest(BaseModel):
+    """
+    - Em SANDBOX: payment_id pode ser omitido
+    - Em PRODUÇÃO: payment_id é OBRIGATÓRIO
+    """
     username: str
     plan: str  # pro | don
     months: int = 1
     email: Optional[str] = None
+
+    # CRÍTICO PARA PRODUÇÃO
+    payment_id: Optional[str] = None
 
 
 class PaymentProcessResponse(BaseModel):

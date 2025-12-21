@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -87,7 +88,7 @@ def create_checkout_preference(
 ):
     """
     Cria uma PREFERENCE do Mercado Pago.
-    Pode rodar em modo SANDBOX ou REAL.
+    Roda em SANDBOX ou PRODUÇÃO dependendo do token.
     """
 
     plan_id = normalize_plan(payload.plan)
@@ -116,9 +117,6 @@ def create_checkout_preference(
             detail="Mercado Pago não configurado (MP_ACCESS_TOKEN ausente)",
         )
 
-    # ========================================================
-    # MERCADO PAGO SDK
-    # ========================================================
     import mercadopago
 
     sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
@@ -165,18 +163,23 @@ def create_checkout_preference(
 
 
 # ============================================================
-# ENDPOINT 2 — PROCESSAMENTO (webhook / modo fake)
+# ENDPOINT 2 — PROCESSAMENTO (PRODUÇÃO-SAFE)
 # ============================================================
 @router.post("/process", response_model=PaymentProcessResponse)
 def process_payment(
     payload: PaymentProcessRequest,
     db: Session = Depends(get_db),
+    x_webhook_secret: str | None = Header(default=None),
 ):
     """
     Processa pagamento aprovado.
-    Usado por:
-    - Webhook Mercado Pago
-    - Modo fake / sandbox
+
+    Em PRODUÇÃO:
+    - Exige payment_id
+    - Valida pagamento no Mercado Pago
+    - Confere status = approved
+    - Confere external_reference
+    - Impede ativação manual/fake
     """
 
     plan_id = normalize_plan(payload.plan)
@@ -198,6 +201,44 @@ def process_payment(
 
     if not plan.is_sellable:
         raise HTTPException(status_code=400, detail="Plano inválido")
+
+    # ========================================================
+    # PRODUÇÃO — valida pagamento real
+    # ========================================================
+    if settings.MP_ENV == "production":
+        if not payload.payment_id:
+            raise HTTPException(
+                status_code=400,
+                detail="payment_id é obrigatório em produção",
+            )
+
+        # Header de segurança opcional
+        if settings.MP_WEBHOOK_SECRET:
+            if x_webhook_secret != settings.MP_WEBHOOK_SECRET:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Webhook não autorizado",
+                )
+
+        import mercadopago
+
+        sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
+        payment = sdk.payment().get(payload.payment_id)
+
+        if payment.get("status") != 200:
+            raise HTTPException(400, "Pagamento não encontrado no Mercado Pago")
+
+        payment_data = payment["response"]
+
+        if payment_data.get("status") != "approved":
+            raise HTTPException(400, "Pagamento não aprovado")
+
+        expected_ref = f"{user.username}:{plan.id}:{months}"
+        if payment_data.get("external_reference") != expected_ref:
+            raise HTTPException(
+                400,
+                "Referência de pagamento inválida",
+            )
 
     # ========================================================
     # APLICA PLANO (pagamento aprovado)

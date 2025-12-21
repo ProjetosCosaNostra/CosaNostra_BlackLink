@@ -1,86 +1,159 @@
-from __future__ import annotations
-
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
 
 from app.database import get_db
-from app import models, schemas
-from app.services.plan_manager import get_policy, normalize_plan, sync_user_plan
+from app.models import Product, User
+from app.schemas import (
+    ProductCreate,
+    ProductUpdate,
+    ProductOut,
+)
 
-router = APIRouter(prefix="/product", tags=["Product"])
+router = APIRouter(
+    prefix="/product",
+    tags=["Product"]
+)
+
+# ============================================================
+# LIMITES DE PRODUTOS POR PLANO
+# ============================================================
+PLAN_PRODUCT_LIMITS = {
+    "free": 3,
+    "pro": 20,
+    "don": None,  # ilimitado
+}
 
 
-def _get_user_by_username(db: Session, username: str) -> models.BlackLinkUser:
-    username = username.lower().strip()
-    user = db.query(models.BlackLinkUser).filter(models.BlackLinkUser.username == username).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuário BlackLink não encontrado.")
-    return sync_user_plan(db, user)
+def check_product_limit(user: User, db: Session):
+    plan = (user.plan or "free").lower()
+    limit = PLAN_PRODUCT_LIMITS.get(plan, 3)
 
-
-def _get_product_by_id(db: Session, product_id: int) -> models.BlackLinkProduct:
-    product = db.query(models.BlackLinkProduct).filter(models.BlackLinkProduct.id == product_id).first()
-    if not product:
-        raise HTTPException(status_code=404, detail="Produto não encontrado.")
-    return product
-
-
-def _enforce_product_limit(db: Session, user: models.BlackLinkUser) -> None:
-    plan = normalize_plan(user.plan)
-    policy = get_policy(plan)
-    limit = policy.product_limit
+    # DON = ilimitado
     if limit is None:
         return
 
-    count = db.query(models.BlackLinkProduct).filter(models.BlackLinkProduct.owner_id == user.id).count()
-    if count >= limit:
-        raise HTTPException(status_code=403, detail=f"Limite de produtos do plano {plan.upper()} atingido ({limit}).")
+    total_products = (
+        db.query(Product)
+        .filter(Product.owner_id == user.id)
+        .count()
+    )
+
+    if total_products >= limit:
+        # 🎯 MENSAGEM DE UPGRADE
+        if plan == "free":
+            raise HTTPException(
+                status_code=403,
+                detail={
+                    "error": "product_limit_reached",
+                    "message": (
+                        "Você atingiu o limite de 3 produtos do plano FREE. "
+                        "Faça upgrade para o plano PRO e libere até 20 produtos."
+                    ),
+                    "current_plan": "FREE",
+                    "suggested_plan": "PRO",
+                    "upgrade_required": True
+                }
+            )
+
+        # fallback (PRO atingiu limite)
+        raise HTTPException(
+            status_code=403,
+            detail=f"Limite de produtos atingido para o plano {plan.upper()} ({limit})"
+        )
 
 
-@router.get("/{username}", response_model=List[schemas.ProductOut])
-def list_products_for_user(username: str, db: Session = Depends(get_db)):
-    user = _get_user_by_username(db, username)
-    return (
-        db.query(models.BlackLinkProduct)
-        .filter(models.BlackLinkProduct.owner_id == user.id)
-        .order_by(models.BlackLinkProduct.id.desc())
+# ============================================================
+# GET /product/{username}
+# Lista produtos do usuário
+# ============================================================
+@router.get("/{username}", response_model=List[ProductOut])
+def list_products_for_user(
+    username: str,
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    products = (
+        db.query(Product)
+        .filter(Product.owner_id == user.id)
+        .order_by(Product.id.desc())
         .all()
     )
 
+    return products
 
-@router.post("/{username}", response_model=schemas.ProductOut, status_code=201)
-def create_product_for_user(username: str, product_in: schemas.ProductCreate, db: Session = Depends(get_db)):
-    user = _get_user_by_username(db, username)
-    _enforce_product_limit(db, user)
 
-    data = product_in.model_dump()
-    product = models.BlackLinkProduct(owner_id=user.id, **data)
+# ============================================================
+# POST /product/{username}
+# Cria produto (COM BLOQUEIO + MENSAGEM DE UPGRADE)
+# ============================================================
+@router.post("/{username}", response_model=ProductOut, status_code=201)
+def create_product_for_user(
+    username: str,
+    payload: ProductCreate,
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # 🔒 BLOQUEIO POR PLANO (com mensagem de upgrade)
+    check_product_limit(user, db)
+
+    product = Product(
+        owner_id=user.id,
+        **payload.model_dump()
+    )
 
     db.add(product)
     db.commit()
     db.refresh(product)
+
     return product
 
 
-@router.patch("/edit/{product_id}", response_model=schemas.ProductOut)
-def update_product(product_id: int, product_update: schemas.ProductUpdate, db: Session = Depends(get_db)):
-    product = _get_product_by_id(db, product_id)
+# ============================================================
+# PATCH /product/edit/{product_id}
+# Atualiza produto
+# ============================================================
+@router.patch("/edit/{product_id}", response_model=ProductOut)
+def update_product(
+    product_id: int,
+    payload: ProductUpdate,
+    db: Session = Depends(get_db),
+):
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
 
-    data = product_update.model_dump(exclude_unset=True)
+    data = payload.model_dump(exclude_unset=True)
+
     for field, value in data.items():
         setattr(product, field, value)
 
-    db.add(product)
     db.commit()
     db.refresh(product)
+
     return product
 
 
+# ============================================================
+# DELETE /product/{product_id}
+# Deleta produto
+# ============================================================
 @router.delete("/{product_id}", status_code=204)
-def delete_product(product_id: int, db: Session = Depends(get_db)):
-    product = _get_product_by_id(db, product_id)
+def delete_product(
+    product_id: int,
+    db: Session = Depends(get_db),
+):
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
     db.delete(product)
     db.commit()
+
     return None
