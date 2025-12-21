@@ -18,7 +18,6 @@ TEMPLATES_DIR = BASE_DIR / "templates"
 
 # ==================================================
 # PLANOS / LIMITES SAAS (LEGADO)
-# Mantido por compatibilidade com admin / dependencies
 # ==================================================
 PLAN_LIMITS: Dict[str, Dict[str, Any]] = {
     "free": {
@@ -34,7 +33,7 @@ PLAN_LIMITS: Dict[str, Dict[str, Any]] = {
         "featured_allowed": True,
     },
     "don": {
-        "max_products": None,  # ilimitado
+        "max_products": None,
         "auto_ingest": True,
         "link_guardian": True,
         "featured_allowed": True,
@@ -67,11 +66,6 @@ def _join_url(base: str, path: str) -> str:
 class Settings(BaseSettings):
     """
     Config central do BlackLink.
-
-    IMPORTANTE:
-    - APP_BASE_URL deve ser a URL pública acessível externamente.
-      Local: http://localhost
-      Produção: https://seu-dominio.com
     """
 
     model_config = SettingsConfigDict(
@@ -81,9 +75,9 @@ class Settings(BaseSettings):
     )
 
     # --------------------------------------------------
-    # APP
+    # APP / AMBIENTE
     # --------------------------------------------------
-    ENV: str = "dev"
+    ENV: str = "dev"  # dev | prod
     APP_BASE_URL: str = "http://localhost"
 
     # --------------------------------------------------
@@ -92,10 +86,16 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./blacklink.db"
 
     # --------------------------------------------------
+    # MERCADO PAGO — AMBIENTE
+    # --------------------------------------------------
+    MP_ENV: str = "test"  # test | production
+
+    # --------------------------------------------------
     # MERCADO PAGO — CREDENCIAIS
     # --------------------------------------------------
     MP_ACCESS_TOKEN: Optional[str] = None
     MP_PUBLIC_KEY: Optional[str] = None
+    MP_WEBHOOK_SECRET: Optional[str] = None
 
     # --------------------------------------------------
     # MERCADO PAGO — PATHS INTERNOS
@@ -106,8 +106,7 @@ class Settings(BaseSettings):
     MP_PENDING_PATH: str = "/payment/pending"
 
     # --------------------------------------------------
-    # MERCADO PAGO — URLs FINAIS
-    # (sempre existirão após o init)
+    # MERCADO PAGO — URLs FINAIS (geradas)
     # --------------------------------------------------
     MP_WEBHOOK_URL: Optional[str] = None
     MP_SUCCESS_URL: Optional[str] = None
@@ -115,10 +114,9 @@ class Settings(BaseSettings):
     MP_PENDING_URL: Optional[str] = None
 
     # --------------------------------------------------
-    # POST INIT — GARANTIA ABSOLUTA DE ATRIBUTOS
+    # POST INIT — GARANTIA ABSOLUTA
     # --------------------------------------------------
     def model_post_init(self, __context: Any) -> None:
-        # URLs públicas completas (SEMPRE definidas)
         self.MP_WEBHOOK_URL = (
             self.MP_WEBHOOK_URL
             or _join_url(self.APP_BASE_URL, self.MP_WEBHOOK_PATH)
@@ -139,14 +137,15 @@ class Settings(BaseSettings):
             or _join_url(self.APP_BASE_URL, self.MP_PENDING_PATH)
         )
 
-        # Segurança em produção
-        if self.ENV == "prod" and not self.MP_ACCESS_TOKEN:
-            raise RuntimeError(
-                "MP_ACCESS_TOKEN é obrigatório em produção"
-            )
+        # 🔥 HARD FAIL EM PRODUÇÃO
+        if self.ENV == "prod":
+            if not self.MP_ACCESS_TOKEN:
+                raise RuntimeError("MP_ACCESS_TOKEN é obrigatório em produção")
+            if self.MP_ENV != "production":
+                raise RuntimeError("MP_ENV deve ser 'production' em produção")
 
 
 # ==================================================
-# INSTANCE GLOBAL (SEMPRE SEGURA)
+# INSTANCE GLOBAL
 # ==================================================
 settings = Settings()

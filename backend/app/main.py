@@ -25,7 +25,7 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 # ==================================================
 # DATABASE
 # ==================================================
-from app.database import Base, engine, ensure_sqlite_schema
+from app.database import ensure_sqlite_schema
 
 # ==================================================
 # SETTINGS
@@ -66,7 +66,7 @@ from app.routers import (
     panel,
     payment,
     plan,
-    webhook,   # 🔥 OBRIGATÓRIO — ESTAVA FALTANDO
+    webhook,
 )
 
 # ==================================================
@@ -81,12 +81,10 @@ app.include_router(panel.router, tags=["Panel"])
 app.include_router(payment.router, tags=["Payment"])
 app.include_router(plan.router, tags=["Plan"])
 
-# 🔥🔥🔥 WEBHOOK MERCADO PAGO 🔥🔥🔥
-app.include_router(
-    webhook.router,
-    prefix="/webhook",
-    tags=["Webhook"],
-)
+# ✅ IMPORTANTE:
+# O router do webhook JÁ tem prefix="/webhook" dentro do arquivo webhook.py
+# então aqui NÃO coloque prefix novamente.
+app.include_router(webhook.router, tags=["Webhook"])
 
 # ==================================================
 # STARTUP
