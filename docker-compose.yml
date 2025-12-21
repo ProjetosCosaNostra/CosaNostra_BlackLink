@@ -1,0 +1,33 @@
+services:
+  backend:
+    build: .
+    container_name: blacklink_backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - blacklink_data:/data
+    environment:
+      - DATABASE_URL=sqlite:////data/blacklink.db
+    networks:
+      - blacklink_net
+
+  nginx:
+    image: nginx:stable
+    container_name: blacklink_nginx
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - blacklink_net
+
+networks:
+  blacklink_net:
+    driver: bridge
+
+volumes:
+  blacklink_data:

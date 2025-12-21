@@ -178,7 +178,7 @@
         <ul>
             <li>3 Temas premium</li>
             <li>Links ilimitados</li>
-            <li>Página de produto automática</li>
+            <li>Produto do dia ativo</li>
             <li>Suporte padrão</li>
         </ul>
         <a class="btn btn-premium" href="#gerador" onclick="setPlano('premium')">Começar</a>
@@ -218,6 +218,7 @@
 
 <script>
 let planoSelecionado = "free";
+const API_BASE = "http://127.0.0.1:8000";
 
 function setPlano(plano) {
     planoSelecionado = plano;
@@ -231,17 +232,12 @@ async function gerarLink() {
         return;
     }
 
-    const theme =
-        planoSelecionado === "free" ? "corleone" :
-        planoSelecionado === "premium" ? "ghost" :
-        "viper";
-
     const payload = {
         username: username,
-        theme: theme
+        theme: "premium"  // por enquanto um tema só; depois diferenciamos por plano
     };
 
-    const res = await fetch("http://localhost:8000/api/blacklinks/", {
+    const res = await fetch(API_BASE + "/blacklinks/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -250,18 +246,23 @@ async function gerarLink() {
     const area = document.getElementById("result-link");
 
     if (!res.ok) {
-        const err = await res.json();
-        area.innerHTML = "❌ Erro: " + (err.detail || "não foi possível criar o link");
+        let msg = "Erro ao criar o BlackLink.";
+        try {
+            const err = await res.json();
+            if (err.detail) msg += " " + err.detail;
+        } catch(e) {}
+        area.innerHTML = "❌ " + msg;
         return;
     }
 
     const data = await res.json();
-    const finalUrl = "/users/" + data.username + "/";
+
+    const fullUrl = window.location.origin + data.url.replace("/users", "/users");
 
     area.innerHTML =
         "🔗 Seu BlackLink foi criado:<br><br>" +
-        "<a href='" + finalUrl + "' target='_blank' style='color:#f1d17d;'>" +
-        window.location.origin + finalUrl +
+        "<a href='" + data.url + "' target='_blank' style='color:#f1d17d;'>" +
+        data.url +
         "</a>";
 }
 </script>

@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CosaNostra BlackLink | SaaS para links, vitrine e monetização</title>
+
+  <meta name="description" content="BlackLink é um SaaS premium para criadores, afiliados e marcas que querem centralizar links, vender produtos e monetizar com estrutura profissional." />
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="CosaNostra BlackLink | Infraestrutura de negócio (não só link na bio)" />
+  <meta property="og:description" content="Centralize presença digital, vitrine de produtos/afiliados e monetização com estrutura SaaS: painel, planos e escala." />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pt_BR" />
+  <!-- Se quiser: quando tiver URL pública, coloque aqui -->
+  <!-- <meta property="og:url" content="https://SEU-DOMINIO" /> -->
+  <!-- Se quiser preview com imagem: publique uma imagem e aponte aqui -->
+  <!-- <meta property="og:image" content="https://SEU-DOMINIO/assets/og-blacklink.jpg" /> -->
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="CosaNostra BlackLink | Infraestrutura de negócio" />
+  <meta name="twitter:description" content="Links + vitrine + monetização com estrutura SaaS real." />
+
+  <style>
+    :root{
+      --bg:#000;
+      --panel:#0b0b0b;
+      --panel2:#070707;
+      --gold:#d4af37;
+      --gold2:#b88b21;
+      --text:#eaeaea;
+      --muted:#a3a3a3;
+      --muted2:#7a7a7a;
+      --border:rgba(212,175,55,.18);
+      --border2:rgba(255,255,255,.08);
+      --shadow:0 18px 55px rgba(0,0,0,.55);
+      --shadow2:0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+      --radius2:14px;
+      --max:1200px;
+      --pad:24px;
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 700px at 50% -10%, rgba(212,175,55,.14) 0%, rgba(212,175,55,.04) 25%, rgba(0,0,0,0) 60%),
+        radial-gradient(900px 600px at 10% 10%, rgba(255,255,255,.06) 0%, rgba(0,0,0,0) 60%),
+        radial-gradient(900px 600px at 90% 35%, rgba(212,175,55,.08) 0%, rgba(0,0,0,0) 60%),
+        #000;
+      color: var(--text);
+      line-height:1.65;
+      overflow-x:hidden;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    img{ max-width:100%; display:block; }
+
+    /* subtle grain */
+    .grain{
+      pointer-events:none;
+      position:fixed;
+      inset:0;
+      opacity:.08;
+      mix-blend-mode:overlay;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      background-size:180px 180px;
+    }
+
+    /* HEADER */
+    header{
+      position:fixed;
+      top:0; left:0; right:0;
+      z-index:200;
+      background: linear-gradient(to bottom, rgba(0,0,0,.86), rgba(0,0,0,.40), rgba(0,0,0,0));
+      border-bottom:1px solid rgba(212,175,55,.10);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav{
+      max-width:var(--max);
+      margin:auto;
+      padding:16px var(--pad);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:220px;
+    }
+
+    .brand .word{
+      display:flex;
+      flex-direction:column;
+      line-height:1.1;
+    }
+
+    .brand .word strong{
+      letter-spacing:.08em;
+      font-weight:900;
+      text-transform:uppercase;
+      font-size:.92rem;
+    }
+    .brand .word span{
+      color:var(--muted2);
+      font-size:.82rem;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      padding:9px 12px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:.88rem;
+      white-space:nowrap;
+    }
+    .pill b{ color:var(--gold); font-weight:900; }
+
+    .menu{
+      display:flex;
+      align-items:center;
+      gap:22px;
+      justify-content:flex-end;
+      flex:1;
+    }
+
+    .menu a{
+      color:#cfcfcf;
+      font-weight:650;
+      font-size:.95rem;
+      opacity:.88;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .menu a:hover{
+      opacity:1;
+      transform: translateY(-1px);
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:13px 18px;
+      border-radius:12px;
+      font-weight:900;
+      letter-spacing:.02em;
+      border:1px solid transparent;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+      white-space:nowrap;
+    }
+
+    .btn.primary{
+      background: linear-gradient(180deg, var(--gold) 0%, var(--gold2) 100%);
+      color:#000;
+      box-shadow: 0 10px 32px rgba(212,175,55,.18);
+    }
+    .btn.primary:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 6px rgba(212,175,55,.18), 0 16px 44px rgba(0,0,0,.55);
+    }
+
+    .btn.outline{
+      background: rgba(255,255,255,.02);
+      border-color: rgba(212,175,55,.55);
+      color: var(--gold);
+    }
+    .btn.outline:hover{
+      background: rgba(212,175,55,.10);
+      transform: translateY(-2px);
+    }
+
+    .btn.ghost{
+      background: rgba(255,255,255,.02);
+      border-color: rgba(255,255,255,.10);
+      color:#e7e7e7;
+    }
+    .btn.ghost:hover{
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    /* MAIN LAYOUT */
+    .wrap{
+      max-width:var(--max);
+      margin:auto;
+      padding: 0 var(--pad);
+    }
+
+    .hero{
+      min-height:100vh;
+      padding-top:110px;
+      padding-bottom:60px;
+      display:flex;
+      align-items:center;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap:34px;
+      align-items:center;
+    }
+
+    .hero-left{
+      padding: 22px 0;
+    }
+
+    .hero-badge{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:12px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      border:1px solid rgba(212,175,55,.20);
+      background: rgba(212,175,55,.06);
+      padding:10px 12px;
+      border-radius:999px;
+      color:#e8e0c2;
+      font-weight:850;
+      font-size:.88rem;
+    }
+    .tag .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 5px rgba(212,175,55,.18);
+    }
+
+    h1{
+      font-size: clamp(2.2rem, 4.1vw, 4.0rem);
+      line-height:1.08;
+      letter-spacing:-.03em;
+      margin-bottom:16px;
+      font-weight:950;
+    }
+    .gold{ color: var(--gold); }
+
+    .lead{
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 720px;
+      margin-bottom: 14px;
+    }
+
+    .lead strong{
+      color:#f3e7b9;
+      font-weight:950;
+    }
+
+    .bullets{
+      margin: 18px 0 28px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 18px;
+      max-width: 760px;
+    }
+    .bullet{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color:#cfcfcf;
+      font-size:.95rem;
+      opacity:.95;
+    }
+    .bullet i{
+      width:18px; height:18px;
+      margin-top:3px;
+      border-radius:6px;
+      background: rgba(212,175,55,.12);
+      border: 1px solid rgba(212,175,55,.25);
+      position:relative;
+      flex:0 0 18px;
+    }
+    .bullet i:after{
+      content:"";
+      position:absolute;
+      inset:4px;
+      border-radius:4px;
+      background: linear-gradient(180deg, var(--gold) 0%, var(--gold2) 100%);
+      opacity:.9;
+    }
+
+    .hero-actions{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin-top: 8px;
+    }
+
+    .micro{
+      color: rgba(255,255,255,.55);
+      font-size: .86rem;
+      margin-top: 12px;
+    }
+    .micro b{ color: var(--gold); font-weight:950; }
+
+    /* right side mock */
+    .hero-right{
+      position:relative;
+    }
+
+    .mock{
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.02) 100%);
+      border: 1px solid rgba(212,175,55,.18);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .mock-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.30);
+    }
+
+    .mock-top .left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .mock-top .title{
+      font-weight:950;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      font-size:.85rem;
+      color:#eaeaea;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 260px;
+    }
+
+    .dots{
+      display:flex; gap:6px;
+    }
+    .dot{
+      width:9px; height:9px; border-radius:50%;
+      background: rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.10);
+    }
+
+    .mock-body{
+      padding: 18px;
+      display:grid;
+      gap: 12px;
+      background:
+        radial-gradient(600px 300px at 20% -10%, rgba(212,175,55,.18), rgba(0,0,0,0) 60%),
+        rgba(0,0,0,.35);
+    }
+
+    .logo-main{
+      width: 176px;
+      filter: drop-shadow(0 0 28px rgba(212,175,55,.18));
+    }
+
+    .mock-card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.18));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 14px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+
+    .mock-card .k{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+      min-width:0;
+    }
+    .mock-card .k strong{
+      font-size:.95rem;
+      letter-spacing:.01em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .mock-card .k span{
+      color: rgba(255,255,255,.55);
+      font-size:.84rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .mock-card .pill2{
+      padding:9px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(212,175,55,.24);
+      background: rgba(212,175,55,.10);
+      color: #f0e3b3;
+      font-weight:950;
+      font-size:.82rem;
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .stat{
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 14px;
+      text-align:left;
+    }
+    .stat b{
+      display:block;
+      font-size: 1.05rem;
+      color: var(--gold);
+      font-weight:950;
+      margin-bottom:4px;
+    }
+    .stat span{
+      font-size: .84rem;
+      color: rgba(255,255,255,.60);
+    }
+
+    /* TRUST STRIP */
+    .trust{
+      padding: 18px 0 0;
+      margin-top:-22px;
+    }
+
+    .trust-row{
+      display:flex;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:center;
+      opacity:.92;
+    }
+
+    .trust-item{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: .88rem;
+      color: rgba(255,255,255,.70);
+    }
+    .trust-item b{ color: var(--gold); font-weight:950; }
+
+    /* SECTIONS */
+    section{ padding: 92px 0; }
+    .section-title{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+    .section-title h2{
+      font-size: clamp(1.7rem, 2.4vw, 2.4rem);
+      letter-spacing: -.02em;
+      font-weight: 950;
+    }
+    .section-title p{
+      color: var(--muted);
+      max-width: 860px;
+      font-size: 1.02rem;
+    }
+
+    .grid3{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card{
+      border-radius: var(--radius);
+      border: 1px solid var(--border2);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.20));
+      box-shadow: var(--shadow2);
+      padding: 22px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-120px -120px auto auto;
+      width:240px;
+      height:240px;
+      background: radial-gradient(circle, rgba(212,175,55,.18), rgba(0,0,0,0) 65%);
+      transform: rotate(25deg);
+      pointer-events:none;
+    }
+
+    .card h3{
+      font-size: 1.05rem;
+      color: #f3e7b9;
+      font-weight: 950;
+      margin-bottom: 10px;
+      letter-spacing:.01em;
+    }
+
+    .card p{
+      color: rgba(255,255,255,.68);
+      font-size: .95rem;
+      max-width: 62ch;
+    }
+
+    .card .hint{
+      margin-top: 14px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      color: rgba(212,175,55,.85);
+      font-weight: 950;
+      font-size: .88rem;
+    }
+
+    .two{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items:stretch;
+    }
+
+    .steps{
+      display:grid;
+      gap: 14px;
+    }
+
+    .step{
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      padding: 18px 18px;
+      display:flex;
+      gap: 14px;
+      align-items:flex-start;
+    }
+    .num{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 950;
+      background: rgba(212,175,55,.12);
+      border: 1px solid rgba(212,175,55,.25);
+      color: #f3e7b9;
+      flex:0 0 auto;
+    }
+    .step b{
+      display:block;
+      font-size: .98rem;
+      margin-bottom: 4px;
+      font-weight:950;
+    }
+    .step span{
+      color: rgba(255,255,255,.65);
+      font-size: .92rem;
+    }
+
+    /* PRICING */
+    .pricing{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      align-items:stretch;
+      margin-top: 18px;
+    }
+
+    .price{
+      border-radius: 22px;
+      border: 1px solid rgba(212,175,55,.18);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.22));
+      padding: 26px;
+      box-shadow: var(--shadow2);
+      position:relative;
+      overflow:hidden;
+    }
+    .price.featured{
+      border-color: rgba(212,175,55,.45);
+      box-shadow: 0 0 0 6px rgba(212,175,55,.10), var(--shadow);
+      transform: translateY(-6px);
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-size:.82rem;
+      font-weight: 950;
+      color:#000;
+      background: linear-gradient(180deg, var(--gold) 0%, var(--gold2) 100%);
+      padding: 9px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .price h3{
+      font-size: 1.08rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 950;
+      color: #f3e7b9;
+      margin-bottom: 8px;
+    }
+
+    .money{
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      margin: 12px 0 8px;
+    }
+    .money b{
+      font-size: 2.2rem;
+      letter-spacing:-.02em;
+      color: var(--gold);
+      font-weight: 950;
+    }
+    .money span{
+      color: rgba(255,255,255,.58);
+      font-size: .92rem;
+      padding-bottom: 6px;
+    }
+
+    .price p{
+      color: rgba(255,255,255,.65);
+      font-size: .95rem;
+      margin-bottom: 14px;
+    }
+
+    .list{
+      list-style:none;
+      display:grid;
+      gap: 10px;
+      margin: 14px 0 20px;
+    }
+    .list li{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      color: rgba(255,255,255,.74);
+      font-size: .93rem;
+    }
+    .check{
+      width: 18px; height: 18px;
+      border-radius: 6px;
+      background: rgba(212,175,55,.12);
+      border: 1px solid rgba(212,175,55,.22);
+      position:relative;
+      margin-top: 3px;
+      flex:0 0 18px;
+    }
+    .check:after{
+      content:"";
+      position:absolute;
+      left:5px; top:3px;
+      width:6px; height:10px;
+      border-right:2px solid var(--gold);
+      border-bottom:2px solid var(--gold);
+      transform: rotate(40deg);
+      opacity:.95;
+    }
+
+    /* SOCIAL */
+    .social-grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .social{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      padding: 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+      min-height: 86px;
+    }
+    .social:hover{
+      transform: translateY(-3px);
+      border-color: rgba(212,175,55,.28);
+      background: rgba(212,175,55,.05);
+    }
+    .social b{
+      color:#f3e7b9;
+      font-weight: 950;
+      letter-spacing:.01em;
+    }
+    .social span{
+      color: rgba(255,255,255,.62);
+      font-size: .90rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    /* FAQ */
+    .faq{
+      display:grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    details{
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      border-radius: 16px;
+      padding: 16px 16px;
+    }
+    summary{
+      cursor:pointer;
+      font-weight: 950;
+      color: #f3e7b9;
+      list-style:none;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    details p{
+      margin-top: 10px;
+      color: rgba(255,255,255,.68);
+      font-size: .94rem;
+      max-width: 90ch;
+    }
+
+    /* FINAL CTA */
+    .final{
+      border-radius: 26px;
+      border: 1px solid rgba(212,175,55,.18);
+      background:
+        radial-gradient(700px 320px at 20% 0%, rgba(212,175,55,.18), rgba(0,0,0,0) 60%),
+        linear-gradient(180deg, rgba(255,255,255,.03), rgba(0,0,0,.30));
+      box-shadow: var(--shadow);
+      padding: 30px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 22px;
+      flex-wrap:wrap;
+    }
+    .final h2{
+      font-size: 1.6rem;
+      letter-spacing:-.02em;
+      font-weight: 950;
+    }
+    .final p{
+      color: rgba(255,255,255,.68);
+      max-width: 70ch;
+      margin-top: 8px;
+    }
+
+    footer{
+      border-top:1px solid rgba(255,255,255,.08);
+      padding: 34px var(--pad);
+      color: rgba(255,255,255,.46);
+      font-size: .88rem;
+    }
+    .foot{
+      max-width:var(--max);
+      margin:auto;
+      display:flex;
+      justify-content:space-between;
+      gap: 16px;
+      flex-wrap:wrap;
+    }
+    .foot a{
+      color: rgba(212,175,55,.90);
+      font-weight: 950;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 980px){
+      .hero-grid{ grid-template-columns: 1fr; }
+      .hero{ padding-top: 100px; }
+      .bullets{ grid-template-columns: 1fr; }
+      .grid3{ grid-template-columns: 1fr; }
+      .two{ grid-template-columns: 1fr; }
+      .pricing{ grid-template-columns: 1fr; }
+      .price.featured{ transform:none; }
+      .social-grid{ grid-template-columns: repeat(2, 1fr); }
+      .brand{ min-width:0; }
+      .pill{ display:none; }
+    }
+    @media (max-width: 520px){
+      .menu{ gap:14px; }
+      .menu a{ font-size:.92rem; }
+      .btn{ width:100%; }
+      .hero-actions{ width:100%; }
+      .social-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="grain"></div>
+
+  <header>
+    <div class="nav">
+      <a class="brand" href="#topo" aria-label="Voltar ao topo">
+        <div class="word">
+          <strong>CosaNostra BlackLink</strong>
+          <span>SaaS • links, vitrine e monetização</span>
+        </div>
+      </a>
+
+      <div class="pill" title="Status do produto">
+        <b>●</b> Base SaaS pronta — agora é publicar e escalar
+      </div>
+
+      <nav class="menu" aria-label="Navegação">
+        <a href="#produto">Produto</a>
+        <a href="#como">Como funciona</a>
+        <a href="#planos">Planos</a>
+        <a href="#redes">Redes</a>
+        <a href="#contato">Contato</a>
+        <a href="/login" class="btn ghost">Entrar</a>
+        <a href="/register" class="btn primary">Criar conta</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="topo" class="wrap">
+    <!-- HERO -->
+    <section class="hero" aria-label="Hero">
+      <div class="hero-grid">
+        <div class="hero-left">
+          <div class="hero-badge">
+            <div class="tag"><span class="dot"></span> SaaS premium para criadores, afiliados e marcas</div>
+            <div class="tag" style="background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.10);color:rgba(255,255,255,.80);">
+              Black & Gold • conversão • autoridade
+            </div>
+          </div>
+
+          <h1>
+            Não é “link na bio”.
+            <br/>
+            É <span class="gold">infraestrutura de negócio</span>.
+          </h1>
+
+          <p class="lead">
+            O <strong>CosaNostra BlackLink</strong> centraliza sua presença digital, organiza sua vitrine de produtos/afiliados
+            e te dá um caminho claro de monetização com cara de SaaS: <strong>painel, planos, checkout e escala</strong>.
+          </p>
+
+          <div class="bullets">
+            <div class="bullet"><i></i><span><b>Vitrine premium</b> para produtos e afiliados (Mercado Livre e mais)</span></div>
+            <div class="bullet"><i></i><span><b>Painel de controle</b> para links, produtos e operação</span></div>
+            <div class="bullet"><i></i><span><b>Branding Black & Gold</b> com foco em confiança e conversão</span></div>
+            <div class="bullet"><i></i><span><b>Pronto pra escalar</b> com planos e integração de pagamento</span></div>
+          </div>
+
+          <div class="hero-actions">
+            <a href="/register" class="btn primary">Criar conta grátis</a>
+            <a href="#produto" class="btn outline">Ver o produto</a>
+            <a href="#planos" class="btn ghost">Ver planos</a>
+          </div>
+
+          <div class="micro">
+            Comece no <b>FREE</b>. Quando sua vitrine virar operação, suba para <b>PRO</b> ou <b>DON</b>.
+          </div>
+        </div>
+
+        <div class="hero-right" aria-label="Preview do produto (mock)">
+          <div class="mock">
+            <div class="mock-top">
+              <div class="left">
+                <div class="title">BlackLink • Dashboard (preview)</div>
+              </div>
+              <div class="dots" aria-hidden="true">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+              </div>
+            </div>
+
+            <div class="mock-body">
+              <div style="display:flex; justify-content:center; padding: 6px 0 2px;">
+                <img src="./assets/logo.png" alt="BlackLink Logo" class="logo-main" />
+              </div>
+
+              <div class="mock-card">
+                <div class="k">
+                  <strong>Seu hub premium</strong>
+                  <span>links + vitrine + monetização</span>
+                </div>
+                <div class="pill2">ATIVO</div>
+              </div>
+
+              <div class="mock-card">
+                <div class="k">
+                  <strong>Vitrine de produtos</strong>
+                  <span>afiliados e produtos próprios</span>
+                </div>
+                <div class="pill2">PRO/DON</div>
+              </div>
+
+              <div class="mock-card">
+                <div class="k">
+                  <strong>Checkout e planos</strong>
+                  <span>estrutura SaaS real</span>
+                </div>
+                <div class="pill2">MP</div>
+              </div>
+
+              <div class="stats">
+                <div class="stat"><b>+ cliques</b><span>centralizados no hub</span></div>
+                <div class="stat"><b>+ produtos</b><span>vitrine organizada</span></div>
+                <div class="stat"><b>+ vendas</b><span>monetização de verdade</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="trust">
+            <div class="trust-row">
+              <div class="trust-item"><b>Black & Gold</b> • estética premium</div>
+              <div class="trust-item"><b>SaaS</b> • planos e upgrades</div>
+              <div class="trust-item"><b>Afiliados</b> • vitrine de produtos</div>
+              <div class="trust-item"><b>Escala</b> • pronto pra crescer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUTO -->
+    <section id="produto" aria-label="Produto">
+      <div class="section-title">
+        <h2>O que você compra quando escolhe o <span class="gold">BlackLink</span></h2>
+        <p>
+          Você não compra “uma página”. Você compra um <b>hub profissional</b> que vira seu ponto central de conversão:
+          presença digital organizada, vitrine pronta e caminho claro para monetização.
+        </p>
+      </div>
+
+      <div class="grid3">
+        <div class="card">
+          <h3>Hub central que vende</h3>
+          <p>Seu link vira um ponto único: CTA, redes, produtos e páginas — tudo com estética premium e foco em conversão.</p>
+          <div class="hint">→ Pare de espalhar link. Concentre poder.</div>
+        </div>
+
+        <div class="card">
+          <h3>Vitrine de produtos e afiliados</h3>
+          <p>Organize produtos do Mercado Livre (e outros) e transforme audiência em vendas com uma vitrine profissional.</p>
+          <div class="hint">→ Produtos com cara de e-commerce.</div>
+        </div>
+
+        <div class="card">
+          <h3>Painel administrativo real</h3>
+          <p>Controle links, produtos e operação. O BlackLink é projetado como SaaS: estrutura, planos e crescimento.</p>
+          <div class="hint">→ Da bio para a operação.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section id="como" aria-label="Como funciona">
+      <div class="section-title">
+        <h2>Como funciona na prática</h2>
+        <p>
+          Em 10 minutos você tem uma vitrine publicada. Depois, é só evoluir o plano conforme sua operação cresce.
+        </p>
+      </div>
+
+      <div class="two">
+        <div class="steps">
+          <div class="step">
+            <div class="num">1</div>
+            <div>
+              <b>Crie sua conta</b>
+              <span>Comece no FREE e publique seu hub. Um link único para tudo.</span>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="num">2</div>
+            <div>
+              <b>Adicione redes, CTA e vitrine</b>
+              <span>Seu perfil vira uma página premium: redes, botões e produtos organizados.</span>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="num">3</div>
+            <div>
+              <b>Monetize com PRO ou DON</b>
+              <span>Libere vitrine maior, recursos avançados e estrutura pronta para vender mais.</span>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="num">4</div>
+            <div>
+              <b>Escale sua presença</b>
+              <span>Seu hub vira seu “QG” público: autoridade, conversão e operação em um lugar só.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Pra quem é</h3>
+          <p>
+            • Criadores que querem autoridade e conversão<br/>
+            • Afiliados que precisam de vitrine profissional<br/>
+            • Marcas que querem centralizar presença e oferta<br/>
+            • Quem está cansado de “página genérica” sem estrutura
+          </p>
+
+          <div style="height:14px"></div>
+
+          <h3>Resultado esperado</h3>
+          <p>
+            Menos bagunça, mais clareza, mais confiança e um caminho simples para monetizar.
+            <span class="gold">Seu público entende em 5 segundos o que você vende.</span>
+          </p>
+
+          <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="/register" class="btn primary" style="flex:1; min-width:240px;">Criar conta grátis</a>
+            <a href="#planos" class="btn outline" style="flex:1; min-width:240px;">Ver planos</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLANOS -->
+    <section id="planos" aria-label="Planos">
+      <div class="section-title">
+        <h2>Planos pensados para <span class="gold">crescer</span></h2>
+        <p>
+          Comece leve, valide sua vitrine e evolua para PRO/DON quando virar operação.
+          (Valores aqui podem ser ajustados pelo seu catálogo depois.)
+        </p>
+      </div>
+
+      <div class="pricing">
+        <div class="price">
+          <h3>FREE</h3>
+          <div class="money">
+            <b>R$ 0</b><span>/ sempre</span>
+          </div>
+          <p>Para começar e publicar seu hub com o mínimo essencial.</p>
+          <ul class="list">
+            <li><span class="check"></span><span>Links essenciais</span></li>
+            <li><span class="check"></span><span>Até 3 produtos na vitrine</span></li>
+            <li><span class="check"></span><span>Branding BlackLink</span></li>
+          </ul>
+          <a href="/register" class="btn ghost" style="width:100%;">Começar no FREE</a>
+        </div>
+
+        <div class="price featured">
+          <div class="badge">Mais vendido</div>
+          <h3>PRO</h3>
+          <div class="money">
+            <b>R$ 19,90</b><span>/ mês</span>
+          </div>
+          <p>Para quem monetiza de verdade e quer vitrine e operação.</p>
+          <ul class="list">
+            <li><span class="check"></span><span>Até 30 produtos na vitrine</span></li>
+            <li><span class="check"></span><span>Ingestão/uso com Mercado Livre (quando ativado)</span></li>
+            <li><span class="check"></span><span>Prioridade e recursos avançados</span></li>
+          </ul>
+          <a href="/register" class="btn primary" style="width:100%;">Quero PRO</a>
+        </div>
+
+        <div class="price">
+          <h3>DON</h3>
+          <div class="money">
+            <b>R$ 49,90</b><span>/ mês</span>
+          </div>
+          <p>Para operação premium, vitrine grande e máxima prioridade.</p>
+          <ul class="list">
+            <li><span class="check"></span><span>Até 200 produtos na vitrine</span></li>
+            <li><span class="check"></span><span>Recursos premium e prioridade máxima</span></li>
+            <li><span class="check"></span><span>Estrutura para white label (quando ativarmos)</span></li>
+          </ul>
+          <a href="/register" class="btn outline" style="width:100%;">Quero DON</a>
+        </div>
+      </div>
+
+      <div style="margin-top:18px; color:rgba(255,255,255,.55); font-size:.90rem;">
+        * Valores e limites podem ser sincronizados com o catálogo interno do backend.
+      </div>
+    </section>
+
+    <!-- REDES SOCIAIS -->
+    <section id="redes" aria-label="Redes sociais">
+      <div class="section-title">
+        <h2>Presença oficial <span class="gold">CosaNostra</span></h2>
+        <p>
+          Links oficiais (funcionando). Aqui você tem o ecossistema e os canais para contato e prova social.
+        </p>
+      </div>
+
+      <div class="social-grid">
+        <a class="social" href="https://github.com/ProjetosCosaNostra" target="_blank" rel="noopener noreferrer">
+          <b>GitHub</b><span>github.com/ProjetosCosaNostra</span>
+        </a>
+        <a class="social" href="https://www.instagram.com/cosanostra.ai/" target="_blank" rel="noopener noreferrer">
+          <b>Instagram</b><span>@cosanostra.ai</span>
+        </a>
+        <a class="social" href="https://www.linkedin.com/in/felipe-projetoscosanostra/" target="_blank" rel="noopener noreferrer">
+          <b>LinkedIn</b><span>/in/felipe-projetoscosanostra</span>
+        </a>
+        <a class="social" href="https://www.tiktok.com/@cosanostra.ia" target="_blank" rel="noopener noreferrer">
+          <b>TikTok</b><span>@cosanostra.ia</span>
+        </a>
+
+        <a class="social" href="https://www.youtube.com/@CosaNostraAI" target="_blank" rel="noopener noreferrer">
+          <b>YouTube</b><span>@CosaNostraAI</span>
+        </a>
+        <a class="social" href="https://www.facebook.com/profile.php?id=61581351483035" target="_blank" rel="noopener noreferrer">
+          <b>Facebook</b><span>Perfil (recomendado: criar Página)</span>
+        </a>
+        <a class="social" href="https://kwai-video.com/u/@Cosa_Nostra_AI/CNr8xPva" target="_blank" rel="noopener noreferrer">
+          <b>Kwai</b><span>@Cosa_Nostra_AI</span>
+        </a>
+        <a class="social" href="https://www.mercadolivre.com.br/social/felipecosanostra" target="_blank" rel="noopener noreferrer">
+          <b>Mercado Livre</b><span>/social/felipecosanostra</span>
+        </a>
+      </div>
+
+      <div style="margin-top:18px; color:rgba(255,255,255,.55); font-size:.90rem;">
+        Recomendação rápida: no Facebook, crie uma <b>Página</b> do projeto para ter URL limpa, insights e anúncios.
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="conhecer" aria-label="Conhecer BlackLink">
+      <div class="section-title">
+        <h2>Conhecer o <span class="gold">BlackLink</span></h2>
+        <p>
+          Se você quer um hub que pareça “empresa” e não “página genérica”, é aqui.
+          O BlackLink foi desenhado para <b>apresentar oferta</b>, <b>organizar vitrine</b> e <b>converter</b>.
+        </p>
+      </div>
+
+      <div class="faq">
+        <details>
+          <summary>Isso substitui Linktree/Carrd?</summary>
+          <p>
+            Substitui quando você quer algo com cara de operação: vitrine, estrutura SaaS, evolução por planos
+            e uma base preparada para monetização — não só “botões”.
+          </p>
+        </details>
+
+        <details>
+          <summary>Como o BlackLink monetiza?</summary>
+          <p>
+            Você monetiza com vitrine de afiliados (ex.: Mercado Livre), produtos próprios, links de oferta,
+            e evolui para PRO/DON conforme sua operação.
+          </p>
+        </details>
+
+        <details>
+          <summary>Eu preciso de site público para Mercado Pago?</summary>
+          <p>
+            Para liberar recursos de produção, sim — você precisa de uma URL pública válida
+            (mesmo em hospedagem gratuita). Por isso essa landing já está pronta para publicar.
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section aria-label="Chamada final">
+      <div class="final">
+        <div>
+          <h2>Seu público pode ver “um link”… ou ver <span class="gold">um negócio</span>.</h2>
+          <p>
+            Centralize sua operação em um hub premium, com vitrine e estrutura SaaS.
+            Comece no FREE e escale quando estiver pronto.
+          </p>
+        </div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="/register" class="btn primary">Criar conta grátis</a>
+          <a href="#contato" class="btn outline">Falar com a gente</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contato" aria-label="Rodapé">
+    <div class="foot">
+      <div>© 2025 <b>CosaNostra BlackLink</b> — Plataforma SaaS (links, vitrine e monetização)</div>
+      <div style="display:flex; gap:18px; flex-wrap:wrap;">
+        <a href="#redes">Redes</a>
+        <a href="#planos">Planos</a>
+        <a href="#conhecer">Conhecer</a>
+        <a href="/login">Entrar</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

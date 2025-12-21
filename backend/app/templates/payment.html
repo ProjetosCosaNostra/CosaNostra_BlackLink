@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagamento • BlackLink</title>
+
+    <!-- Mercado Pago SDK (apenas para gerar token fake) -->
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+    <style>
+        body {
+            background: #000;
+            color: #d4af37;
+            font-family: Arial, sans-serif;
+        }
+
+        .box {
+            width: 420px;
+            margin: 80px auto;
+            padding: 30px;
+            border: 1px solid #333;
+            border-radius: 12px;
+            background: #0b0b0b;
+            box-shadow: 0 0 30px rgba(212,175,55,.15);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input, button {
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+        }
+
+        input {
+            background: #111;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        button {
+            background: #d4af37;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        #status {
+            margin-top: 15px;
+            min-height: 22px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Pagamento Seguro</h2>
+
+    <!-- DADOS TESTE (FAKE APPROVED) -->
+    <input id="cardNumber" value="4509953566233704" placeholder="Número do cartão">
+    <input id="cardHolderName" value="APRO" placeholder="Nome no cartão">
+    <input id="cardExpirationMonth" value="11" placeholder="MM">
+    <input id="cardExpirationYear" value="25" placeholder="YY">
+    <input id="securityCode" value="123" placeholder="CVV">
+    <input id="docNumber" value="12345678909" placeholder="CPF">
+    <input id="email" value="test_user_123@testuser.com" placeholder="Email">
+
+    <button onclick="pagar()">Pagar R$ 29,90</button>
+
+    <p id="status"></p>
+</div>
+
+<script>
+    const mp = new MercadoPago("{{ public_key }}", { locale: "pt-BR" });
+
+    async function pagar() {
+        const status = document.getElementById("status");
+        status.innerText = "Processando pagamento...";
+
+        try {
+            // 🔐 Criar token fake
+            const tokenResponse = await mp.createCardToken({
+                cardNumber: cardNumber.value,
+                cardholderName: cardHolderName.value,
+                expirationMonth: cardExpirationMonth.value,
+                expirationYear: cardExpirationYear.value,
+                securityCode: securityCode.value,
+                identificationType: "CPF",
+                identificationNumber: docNumber.value
+            });
+
+            if (!tokenResponse || !tokenResponse.id) {
+                status.innerText = "Erro ao gerar token ❌";
+                return;
+            }
+
+            // 🚀 Enviar para backend
+            const response = await fetch("/payment/process", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    token: tokenResponse.id,
+                    transaction_amount: 29.90,
+                    payer_email: email.value
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === "approved") {
+                status.innerText = "Pagamento aprovado ✅ Redirecionando...";
+
+                // 🔁 REDIRECT AUTOMÁTICO (PAINEL PRO)
+                setTimeout(() => {
+                    window.location.href = "/painel";
+                }, 1500);
+
+            } else {
+                status.innerText = "Pagamento recusado ❌";
+            }
+
+        } catch (err) {
+            console.error(err);
+            status.innerText = "Erro inesperado ❌";
+        }
+    }
+</script>
+
+</body>
+</html>

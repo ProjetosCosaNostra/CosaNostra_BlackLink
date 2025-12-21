@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>CosaNostra BlackLink • Link Profissional DON</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CosaNostra BlackLink — o link profissional em estilo Black & Gold Society, com loja automática, produto do dia e automação para afiliados e criadores." />
+
+  <style>
+    :root {
+      --bg-main: #040310;
+      --bg-soft: #0a0818;
+      --bg-card: #0f0b20;
+      --bg-pill: #141022;
+      --gold: #fcb045;
+      --gold-soft: rgba(252, 176, 69, 0.18);
+      --gold-strong: #ffd37a;
+      --text-main: #f7f5ff;
+      --text-soft: #b6b3d6;
+      --text-mute: #7a769a;
+      --danger: #ff5a5f;
+      --border-soft: rgba(255, 255, 255, 0.06);
+      --radius-lg: 26px;
+      --radius-pill: 999px;
+      --shadow-card: 0 24px 80px rgba(0, 0, 0, 0.9);
+      --shadow-gold: 0 0 40px rgba(252, 176, 69, 0.45);
+      --transition-fast: 0.16s ease-out;
+      --max-width: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top center, #1a1430 0, #05030e 35%, #020008 100%);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    /* NAVBAR */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0 20px;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-logo-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 0, #ffffff, #fcb045, #7a4b11);
+      box-shadow: 0 0 14px rgba(252, 176, 69, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #1b1205;
+    }
+
+    .nav-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .nav-brand-title {
+      font-size: 0.9rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .nav-brand-sub {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-mute);
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .nav-link {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      padding: 6px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(10, 8, 24, 0.9);
+    }
+
+    .nav-cta {
+      font-size: 0.8rem;
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(252, 176, 69, 0.9);
+      background: radial-gradient(circle at 0 0, rgba(252, 176, 69, 0.32), #130c21);
+      color: #090807;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      box-shadow: var(--shadow-gold);
+      text-shadow: 0 0 12px rgba(252, 176, 69, 0.7);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-cta span.icon {
+      font-size: 1rem;
+    }
+
+    .nav-cta:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    /* HERO */
+    .hero {
+      margin-top: 10px;
+      padding: 28px 22px 26px;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at 0 -40%, rgba(252, 176, 69, 0.3), transparent 60%),
+        radial-gradient(circle at 100% 140%, rgba(252, 176, 69, 0.36), transparent 60%),
+        linear-gradient(145deg, rgba(10, 7, 24, 0.95), rgba(3, 1, 10, 0.98));
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(252, 176, 69, 0.32);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 32px;
+      align-items: center;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: var(--radius-pill);
+      padding: 4px 10px;
+      border: 1px solid rgba(252, 176, 69, 0.45);
+      background: rgba(4, 3, 12, 0.8);
+      color: var(--gold-strong);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .hero-pill span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffe6a4, #fcb045);
+      box-shadow: 0 0 10px rgba(252, 176, 69, 0.9);
+    }
+
+    .hero-title {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .hero-title span.gold {
+      color: var(--gold-strong);
+    }
+
+    .hero-subtitle {
+      font-size: 0.98rem;
+      color: var(--text-soft);
+      max-width: 440px;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .hero-cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(252, 176, 69, 0.9);
+      background: radial-gradient(circle at 0 0, rgba(252, 176, 69, 0.4), #0b0714);
+      color: #070504;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 16px rgba(252, 176, 69, 0.9);
+      box-shadow: var(--shadow-gold);
+      cursor: pointer;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+    }
+
+    .btn-primary span.icon {
+      font-size: 1.05rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 0 50px rgba(252, 176, 69, 0.8);
+    }
+
+    .btn-ghost {
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(8, 5, 18, 0.8);
+      color: var(--text-soft);
+      font-size: 0.82rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-ghost span.icon {
+      font-size: 1rem;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(17, 12, 34, 0.95);
+      border-color: rgba(252, 176, 69, 0.5);
+      transform: translateY(-1px);
+    }
+
+    .hero-meta {
+      font-size: 0.76rem;
+      color: var(--text-mute);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .hero-meta span.separator {
+      width: 1px;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .hero-meta-highlight {
+      color: var(--gold-strong);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.7rem;
+    }
+
+    /* HERO RIGHT */
+    .hero-card {
+      border-radius: 24px;
+      padding: 18px 16px 16px;
+      background: radial-gradient(circle at 0 0, rgba(252, 176, 69, 0.35), #0b0614);
+      border: 1px solid rgba(252, 176, 69, 0.4);
+      box-shadow: var(--shadow-gold);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .hero-card-pill {
+      border-radius: var(--radius-pill);
+      padding: 3px 9px;
+      border: 1px solid rgba(0, 0, 0, 0.7);
+      background: rgba(5, 4, 12, 0.7);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .hero-card-badge {
+      font-size: 0.7rem;
+      color: var(--gold-strong);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-card-main {
+      padding: 10px 0 6px;
+      border-radius: 18px;
+    }
+
+    .hero-card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .hero-card-sub {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+
+    .hero-card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+
+    .hero-card-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 0.72rem;
+      color: var(--text-mute);
+    }
+
+    .hero-card-metric span.value {
+      font-size: 0.86rem;
+      color: var(--gold-strong);
+      font-weight: 600;
+    }
+
+    .hero-card-button {
+      padding: 7px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(252, 176, 69, 0.9);
+      background: rgba(4, 3, 10, 0.9);
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-strong);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-card-footer {
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: var(--text-mute);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .hero-card-footer span.accent {
+      color: var(--gold-strong);
+    }
+
+    /* SECTION WRAPPER */
+    .section {
+      margin-top: 40px;
+      padding: 24px 20px 20px;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 0 -40%, rgba(252, 176, 69, 0.15), transparent 65%),
+                  radial-gradient(circle at 100% 140%, rgba(252, 176, 69, 0.12), transparent 60%),
+                  linear-gradient(145deg, rgba(8, 6, 20, 0.96), rgba(5, 4, 16, 0.98));
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.9);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+      margin-bottom: 18px;
+    }
+
+    .section-kicker {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .section-title span.gold {
+      color: var(--gold-strong);
+    }
+
+    .section-sub {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      max-width: 420px;
+      line-height: 1.6;
+    }
+
+    /* FEATURES GRID */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .feature-card {
+      padding: 14px 12px 12px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 0 0, rgba(252, 176, 69, 0.15), #070512);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.8rem;
+    }
+
+    .feature-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 12px;
+      background: rgba(252, 176, 69, 0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .feature-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+      font-size: 0.86rem;
+    }
+
+    .feature-text {
+      color: var(--text-soft);
+      font-size: 0.76rem;
+      line-height: 1.5;
+    }
+
+    /* HOW IT WORKS */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      font-size: 0.8rem;
+    }
+
+    .step-card {
+      padding: 14px 12px 12px;
+      border-radius: 18px;
+      background: rgba(8, 5, 18, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .step-number {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      margin-bottom: 2px;
+    }
+
+    .step-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step-text {
+      font-size: 0.76rem;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    /* PLANOS */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .plan-card {
+      padding: 16px 14px 14px;
+      border-radius: 20px;
+      background: rgba(7, 5, 16, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      position: relative;
+      font-size: 0.8rem;
+    }
+
+    .plan-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+      background: rgba(252, 176, 69, 0.1);
+      border: 1px solid rgba(252, 176, 69, 0.5);
+      color: var(--gold-strong);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 8px;
+    }
+
+    .plan-name {
+      font-size: 0.98rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .plan-price {
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      color: var(--gold-strong);
+    }
+
+    .plan-desc {
+      font-size: 0.76rem;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+      min-height: 40px;
+    }
+
+    .plan-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 12px;
+      font-size: 0.76rem;
+      color: var(--text-soft);
+    }
+
+    .plan-list li::before {
+      content: "♟";
+      margin-right: 6px;
+      color: var(--gold-strong);
+      font-size: 0.72rem;
+    }
+
+    .plan-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(252, 176, 69, 0.75);
+      background: rgba(10, 7, 20, 0.95);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--gold-strong);
+    }
+
+    .plan-card.highlight {
+      border-color: rgba(252, 176, 69, 0.9);
+      box-shadow: var(--shadow-gold);
+      background:
+        radial-gradient(circle at 0 0, rgba(252, 176, 69, 0.22), #070512);
+    }
+
+    /* SOCIAL PROOF / FAQ / CTA FINAL */
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      font-size: 0.78rem;
+    }
+
+    .quote-card {
+      background: rgba(6, 4, 14, 0.96);
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px 12px 10px;
+    }
+
+    .quote-text {
+      color: var(--text-soft);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
+    .quote-author {
+      font-size: 0.74rem;
+      color: var(--text-mute);
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px 24px;
+      font-size: 0.78rem;
+    }
+
+    .faq-item-question {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .faq-item-answer {
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .cta-final {
+      text-align: center;
+      margin-top: 26px;
+    }
+
+    .cta-final-title {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .cta-final-sub {
+      font-size: 0.86rem;
+      color: var(--text-soft);
+      margin-bottom: 16px;
+    }
+
+    /* FOOTER */
+    .footer {
+      max-width: var(--max-width);
+      margin: 28px auto 0;
+      padding: 18px 16px 8px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.12);
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-mute);
+    }
+
+    .footer span.logo {
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--gold-strong);
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 920px) {
+      .hero-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero {
+        padding: 22px 18px 22px;
+      }
+
+      .hero-card {
+        order: -1;
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .steps-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .plans-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .quotes-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .faq-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .nav-right {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        padding-inline: 14px;
+      }
+
+      .section {
+        padding-inline: 16px;
+      }
+
+      .features-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .steps-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero {
+        border-radius: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- NAVBAR -->
+    <header class="nav">
+      <div class="nav-left">
+        <div class="nav-logo-circle">BL</div>
+        <div class="nav-brand">
+          <div class="nav-brand-title">CosaNostra BlackLink</div>
+          <div class="nav-brand-sub">Black &amp; Gold Society</div>
+        </div>
+      </div>
+      <nav class="nav-right">
+        <a href="#como-funciona" class="nav-link">Como funciona</a>
+        <a href="#planos" class="nav-link">Planos</a>
+        <a href="#faq" class="nav-link">Perguntas</a>
+        <!-- TODO: TROCAR HREF PELO LINK REAL DO SEU APP -->
+        <a href="#" class="nav-cta">
+          <span class="icon">♟</span>
+          <span>Entrar no Painel</span>
+        </a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-pill">
+            <span class="dot"></span>
+            <span>Link profissional em 2 minutos</span>
+          </div>
+
+          <h1 class="hero-title">
+            Seu <span class="gold">link</span> não pode parecer amador.<br/>
+            Torne-se uma <span class="gold">marca Black &amp; Gold</span> no primeiro clique.
+          </h1>
+
+          <p class="hero-subtitle">
+            CosaNostra BlackLink é o link profissional com estética DON e automação
+            para afiliados, criadores e negócios que querem parecer grandes desde o
+            primeiro acesso.
+          </p>
+
+          <div class="hero-cta-row">
+            <!-- TODO: TROCAR HREF PELO LINK REAL DE CADASTRO -->
+            <a href="#" class="btn-primary">
+              <span class="icon">⚡</span>
+              <span>Criar Meu BlackLink Agora</span>
+            </a>
+            <!-- TODO: TROCAR HREF PELO LINK DO SEU TELEGRAM / SOCIETY -->
+            <a href="https://t.me/BlackGoldSociety" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+              <span class="icon">👑</span>
+              <span>Entrar na Família CosaNostra — Society</span>
+            </a>
+          </div>
+
+          <div class="hero-meta">
+            <span class="hero-meta-highlight">sem cartão · versão gratuita disponível</span>
+            <span class="separator"></span>
+            <span>Loja automática com seus produtos do Mercado Livre e Amazon.</span>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Preview do painel BlackLink">
+          <div class="hero-card-header">
+            <div class="hero-card-pill">Preview do Painel</div>
+            <div class="hero-card-badge">
+              <span>🦂</span>
+              <span>Modo DON Ativado</span>
+            </div>
+          </div>
+          <div class="hero-card-main">
+            <div class="hero-card-title">Felipe — BlackLink Oficial</div>
+            <div class="hero-card-sub">
+              Produto do dia, links sociais e loja automática em um único lugar.
+            </div>
+            <div class="hero-card-row">
+              <div class="hero-card-metric">
+                <span>Cliques (últimos 7 dias)</span>
+                <span class="value">4 218</span>
+              </div>
+              <div class="hero-card-metric">
+                <span>Produtos ativos</span>
+                <span class="value">37</span>
+              </div>
+              <div>
+                <div class="hero-card-button">
+                  <span>VER MEU LINK</span>
+                  <span>⬈</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hero-card-footer">
+            <span>Seu link vira uma vitrine Black &amp; Gold com loja embutida.</span>
+            <span class="accent">CosaNostra BlackLink</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- O QUE VOCÊ RECEBE -->
+    <section class="section" aria-labelledby="section-beneficios">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Black &amp; Gold Society</div>
+          <h2 id="section-beneficios" class="section-title">
+            O que você recebe ao ativar seu <span class="gold">BlackLink</span>
+          </h2>
+        </div>
+        <p class="section-sub">
+          Não é só “mais um link na bio”. É uma estrutura completa de presença
+          profissional, loja automática e automação CosaNostra, construída para
+          vender por você.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <article class="feature-card">
+          <div class="feature-icon">🎩</div>
+          <h3 class="feature-title">Link Profissional DON</h3>
+          <p class="feature-text">
+            Páginas em estilo Black &amp; Gold, tipografia elegante e visual de
+            marca milionária. Seu nome não aparece em layout genérico.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">🛒</div>
+          <h3 class="feature-title">Loja automática</h3>
+          <p class="feature-text">
+            Cada link que você gera no Mercado Livre ou Amazon vira um produto
+            novo na vitrine, sem trabalho manual.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">🔥</div>
+          <h3 class="feature-title">Produto do dia</h3>
+          <p class="feature-text">
+            Destaque diário com call forte, urgência e foco em conversão. Você
+            controla tudo pelo painel DON.
+          </p>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Estatísticas reais</h3>
+          <p class="feature-text">
+            Cliques, produtos mais vistos, horários com mais movimento e origens
+            do tráfego para você tomar decisão como profissional.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section class="section" id="como-funciona" aria-labelledby="section-como-funciona">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Operação em 5 passos</div>
+          <h2 id="section-como-funciona" class="section-title">
+            Como o <span class="gold">BlackLink</span> trabalha por você
+          </h2>
+        </div>
+        <p class="section-sub">
+          Criar seu BlackLink leva menos tempo do que preparar um café. Depois
+          disso, ele assume a linha de frente da sua operação digital.
+        </p>
+      </div>
+
+      <div class="steps-grid">
+        <article class="step-card">
+          <div class="step-number">01</div>
+          <h3 class="step-title">Crie sua conta</h3>
+          <p class="step-text">
+            Cadastro direto, sem fricção. Versão gratuita disponível para você
+            testar sem risco.
+          </p>
+        </article>
+
+        <article class="step-card">
+          <div class="step-number">02</div>
+          <h3 class="step-title">Ative seu BlackLink</h3>
+          <p class="step-text">
+            Escolha seu nome, foto, bio e botões principais. Em poucos cliques
+            você já tem um link de marca.
+          </p>
+        </article>
+
+        <article class="step-card">
+          <div class="step-number">03</div>
+          <h3 class="step-title">Conecte seus produtos</h3>
+          <p class="step-text">
+            Cole o link do Mercado Livre/Amazon. Nós puxamos título, imagem e
+            preço para montar a vitrine.
+          </p>
+        </article>
+
+        <article class="step-card">
+          <div class="step-number">04</div>
+          <h3 class="step-title">Deixe a loja trabalhar</h3>
+          <p class="step-text">
+            Seu público entra, vê seus conteúdos, o produto do dia, seus
+            produtos ativos e faz o movimento certo.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- PLANOS -->
+    <section class="section" id="planos" aria-labelledby="section-planos">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Planos</div>
+          <h2 id="section-planos" class="section-title">
+            Escolha o nível da sua <span class="gold">operação</span>
+          </h2>
+        </div>
+        <p class="section-sub">
+          Comece de graça, valide na prática e evolua para níveis Pro e DON
+          quando sentir que faz sentido para o seu jogo.
+        </p>
+      </div>
+
+      <div class="plans-grid">
+        <article class="plan-card">
+          <div class="plan-tag">Entrada</div>
+          <h3 class="plan-name">Plano Free</h3>
+          <div class="plan-price">R$ 0 / mês</div>
+          <p class="plan-desc">
+            Para quem quer começar agora com um link profissional e sentir o
+            poder da estrutura BlackLink.
+          </p>
+          <ul class="plan-list">
+            <li>1 BlackLink ativo</li>
+            <li>Até 3 produtos na loja</li>
+            <li>Botões sociais ilimitados</li>
+            <li>Produto do dia básico</li>
+          </ul>
+          <!-- TODO: TROCAR HREF PELO FLUXO DE CADASTRO FREE -->
+          <a href="#" class="plan-cta">
+            <span>Começar no Free</span>
+            <span>⬈</span>
+          </a>
+        </article>
+
+        <article class="plan-card highlight">
+          <div class="plan-tag">
+            <span>Recomendado</span>
+          </div>
+          <h3 class="plan-name">Plano Pro</h3>
+          <div class="plan-price">R$ 97 / mês</div>
+          <p class="plan-desc">
+            Para afiliados e criadores que já entenderam o jogo e precisam de
+            uma estrutura de operação diária robusta.
+          </p>
+          <ul class="plan-list">
+            <li>Até 5 BlackLinks ativos</li>
+            <li>Loja com produtos ilimitados</li>
+            <li>Temas DON avançados</li>
+            <li>Estatísticas completas</li>
+            <li>Campanhas com produto do dia</li>
+          </ul>
+          <!-- TODO: TROCAR HREF PELO CHECKOUT PRO -->
+          <a href="#" class="plan-cta">
+            <span>Ativar Plano Pro</span>
+            <span>♟</span>
+          </a>
+        </article>
+
+        <article class="plan-card">
+          <div class="plan-tag">
+            <span>Society</span>
+          </div>
+          <h3 class="plan-name">Plano DON</h3>
+          <div class="plan-price">Sob consulta</div>
+          <p class="plan-desc">
+            Para operações que exigem sigilo, automação total e acesso direto à
+            Sociedade CosaNostra.
+          </p>
+          <ul class="plan-list">
+            <li>Todos os recursos do Pro</li>
+            <li>Temas exclusivos Black &amp; Gold Society</li>
+            <li>Automação com IA estratégica</li>
+            <li>Suporte prioritário</li>
+            <li>Selo oficial da Society</li>
+          </ul>
+          <!-- TODO: TROCAR HREF PELO CANAL DE CONTATO DON -->
+          <a href="https://t.me/BlackGoldSociety" target="_blank" rel="noopener noreferrer" class="plan-cta">
+            <span>Falar com a Sociedade</span>
+            <span>👑</span>
+          </a>
+        </article>
+      </div>
+    </section>
+
+    <!-- PROVA SOCIAL + FAQ -->
+    <section class="section" id="faq">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">Prova &amp; clareza</div>
+          <h2 class="section-title">
+            Quem usa o <span class="gold">BlackLink</span> sente a diferença
+          </h2>
+        </div>
+        <p class="section-sub">
+          Depoimentos reais de quem saiu do amadorismo visual e entrou na
+          estética de marca Black &amp; Gold, junto com respostas diretas para
+          as principais dúvidas.
+        </p>
+      </div>
+
+      <div class="quotes-grid">
+        <article class="quote-card">
+          <p class="quote-text">
+            "Meu link parecia igual ao de todo mundo. Hoje ele parece landing
+            page de marca de luxo, e isso muda totalmente como os clientes me
+            enxergam."
+          </p>
+          <p class="quote-author">— Membro da Society · Afiliado</p>
+        </article>
+
+        <article class="quote-card">
+          <p class="quote-text">
+            "O BlackLink virou meu hub. Vídeos, produtos, links sociais e
+            ofertas: tudo num lugar só, bonito e pensado para conversão."
+          </p>
+          <p class="quote-author">— Criador de Conteúdo</p>
+        </article>
+
+        <article class="quote-card">
+          <p class="quote-text">
+            "Eu já usava link na bio. Mas só quando subi para o visual Black &amp;
+            Gold é que as pessoas começaram a levar a sério o que eu faço."
+          </p>
+          <p class="quote-author">— Consultor Digital</p>
+        </article>
+      </div>
+
+      <div class="section-kicker" style="margin-top: 18px;">FAQ</div>
+      <div class="faq-grid">
+        <div>
+          <div class="faq-item-question">Preciso pagar para começar?</div>
+          <div class="faq-item-answer">
+            Não. Você pode começar pelo plano Free, criar seu BlackLink,
+            cadastrar alguns produtos e só depois decidir se quer evoluir para
+            os planos pagos.
+          </div>
+        </div>
+        <div>
+          <div class="faq-item-question">Funciona só com Mercado Livre?</div>
+          <div class="faq-item-answer">
+            O foco inicial é Mercado Livre, mas a estrutura é feita para
+            receber links de outras plataformas como Amazon e outros afiliados.
+          </div>
+        </div>
+        <div>
+          <div class="faq-item-question">Em quanto tempo eu deixo tudo pronto?</div>
+          <div class="faq-item-answer">
+            A maior parte dos usuários monta um BlackLink funcional em menos de
+            10 minutos, incluindo botões sociais e primeiros produtos na loja.
+          </div>
+        </div>
+        <div>
+          <div class="faq-item-question">Consigo usar em várias redes sociais?</div>
+          <div class="faq-item-answer">
+            Sim. Você pode usar o mesmo link em TikTok, Instagram, YouTube,
+            WhatsApp, anúncios e onde mais fizer sentido para a sua operação.
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-final">
+        <h2 class="cta-final-title">Seu próximo movimento merece um link à altura.</h2>
+        <p class="cta-final-sub">
+          Ative seu BlackLink, deixe sua presença digital no padrão Black &amp;
+          Gold e transforme curiosos em clientes com uma só página.
+        </p>
+        <!-- TODO: TROCAR HREF PELO LINK REAL DE CADASTRO -->
+        <a href="#" class="btn-primary">
+          <span class="icon">⚡</span>
+          <span>Criar Meu BlackLink Agora</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div>Este serviço faz parte da estrutura estratégica da família.</div>
+      <span class="logo">COSANOSTRA BLACKLINK</span>
+    </footer>
+  </div>
+</body>
+</html>

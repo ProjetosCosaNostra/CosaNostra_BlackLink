@@ -1,6 +1,11 @@
 fastapi
-uvicorn[standard]
-sqlalchemy
-pydantic
+uvicorn
 jinja2
-python-multipart
+python-dotenv
+sqlalchemy
+mercadopago
+httpx
+pydantic>=2.0
+pydantic-settings>=2.0
+pytest
+python-dateutil

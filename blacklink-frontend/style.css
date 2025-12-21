@@ -1,0 +1,136 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&display=swap");
+
+:root {
+  --bg: #0b0b0b;
+  --gold: #d4af37;
+  --gold-soft: rgba(212, 175, 55, 0.6);
+  --text: #e6e6e6;
+  --muted: #9a9a9a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(circle at top, #111 0%, #000 60%);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 120px;
+}
+
+.hero h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 3.4rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.hero h1 span {
+  color: var(--gold);
+}
+
+.subtitle {
+  margin-top: 18px;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+
+.cta-group {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-decoration: none;
+  letter-spacing: 0.4px;
+  transition: all 0.3s ease;
+}
+
+.btn.primary {
+  background: var(--gold);
+  color: #000;
+  font-weight: 600;
+}
+
+.btn.primary:hover {
+  background: #bfa02f;
+}
+
+.btn.secondary {
+  border: 1px solid var(--gold-soft);
+  color: var(--gold);
+}
+
+.btn.secondary:hover {
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.section {
+  margin-bottom: 90px;
+}
+
+.section h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  margin-bottom: 18px;
+  color: var(--gold);
+}
+
+.section p {
+  max-width: 760px;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.features {
+  margin-top: 26px;
+  list-style: none;
+}
+
+.features li {
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+
+.highlight {
+  padding: 50px;
+  border-radius: 14px;
+  background: linear-gradient(
+    145deg,
+    rgba(212, 175, 55, 0.08),
+    rgba(0, 0, 0, 0.4)
+  );
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.contact {
+  margin-top: 14px;
+  font-size: 1rem;
+}
+
+.footer {
+  margin-top: 120px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #777;
+}

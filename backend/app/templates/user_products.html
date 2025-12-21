@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>@{{ username }} • Loja Oficial | CosaNostra BlackLink</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="icon" href="/assets/CosaNostraAI.ico" />
+
+    <style>
+        :root {
+            --bg-main: #040416;
+            --bg-card: #090a1f;
+            --bg-card-soft: #0d1028;
+            --accent: #fcb045;
+            --accent-soft: rgba(252, 176, 69, 0.16);
+            --accent-strong: #ffb74a;
+            --text-main: #f5f5ff;
+            --text-muted: #8f93c2;
+            --text-soft: #7378a8;
+            --stroke-soft: rgba(255, 255, 255, 0.06);
+            --chip-bg: rgba(6, 208, 142, 0.15);
+            --chip-text: #5ff7b2;
+            --danger: #ff5c7a;
+            --shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.75);
+            --radius-xl: 22px;
+            --radius-pill: 999px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1b0f3a 0, #040416 55%, #02010b 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 1180px;
+            padding: 40px 20px 64px;
+        }
+
+        /* HEADER COM LOGO */
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+
+        .brand-line {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 18px;
+            border-radius: var(--radius-pill);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: radial-gradient(circle at top left,
+                        rgba(252, 176, 69, 0.22),
+                        rgba(2, 1, 11, 0.9));
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand-logo-wrap {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 0,
+                        #ffffff,
+                        #fcb045,
+                        #f97316);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .brand-logo {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+        }
+
+        .brand-text-main {
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .brand-text-sub {
+            font-size: 10px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .title {
+            text-align: center;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .title span {
+            font-size: 13px;
+            color: var(--text-soft);
+        }
+
+        .title span strong {
+            color: var(--accent-strong);
+        }
+
+        /* BARRA DE BUSCA / FILTROS */
+
+        .toolbar {
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 230px;
+            max-width: 360px;
+            display: flex;
+            background: linear-gradient(135deg, rgba(8, 13, 41, 0.95), #060719);
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--stroke-soft);
+            padding: 2px 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            padding: 9px 10px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-soft);
+        }
+
+        .search-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--text-soft);
+            padding-left: 4px;
+        }
+
+        .toolbar-right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .select {
+            position: relative;
+        }
+
+        .select select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: linear-gradient(135deg, #060719, #0b0c23);
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--stroke-soft);
+            padding: 8px 30px 8px 14px;
+            font-size: 12px;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+
+        .select::after {
+            content: "▾";
+            position: absolute;
+            right: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: var(--text-soft);
+            pointer-events: none;
+        }
+
+        .btn-filter {
+            border-radius: var(--radius-pill);
+            border: none;
+            padding: 9px 22px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: linear-gradient(135deg, #f97316, #fcb045);
+            color: #18141f;
+            cursor: pointer;
+            box-shadow: 0 14px 32px rgba(249, 115, 22, 0.4);
+        }
+
+        /* GRID DE PRODUTOS */
+
+        .summary {
+            margin: 14px 4px 4px;
+            font-size: 12px;
+            color: var(--text-soft);
+            text-align: left;
+        }
+
+        .summary strong {
+            color: var(--accent-strong);
+        }
+
+        .grid {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 320px));
+            gap: 24px;
+        }
+
+        .product-card {
+            background: radial-gradient(circle at top, #151635, #050516);
+            border-radius: 26px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 16px 16px 18px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at top left,
+                        rgba(252, 176, 69, 0.14),
+                        transparent 55%);
+            opacity: 0.65;
+            pointer-events: none;
+        }
+
+        .product-inner {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tag-destino {
+            align-self: flex-start;
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            background: var(--chip-bg);
+            color: var(--chip-text);
+            margin-bottom: 10px;
+        }
+
+        .thumb-wrap {
+            border-radius: 22px;
+            background: radial-gradient(circle at top, #1b1f3f, #090b20);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+
+        .thumb {
+            width: 100%;
+            border-radius: 18px;
+            display: block;
+        }
+
+        .name {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #fdfdff;
+            margin-bottom: 6px;
+        }
+
+        .price {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-strong);
+            margin-bottom: 4px;
+        }
+
+        .subcopy {
+            font-size: 11px;
+            color: var(--text-soft);
+            margin-bottom: 10px;
+        }
+
+        .cta-row {
+            margin-top: auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: space-between;
+        }
+
+        .btn {
+            border-radius: var(--radius-pill);
+            padding: 9px 18px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            border: 1px solid transparent;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.18);
+            color: var(--text-main);
+        }
+
+        .btn-primary {
+            flex: 1;
+            min-width: 140px;
+            background: linear-gradient(135deg, #f97316, #fcb045);
+            color: #18141f;
+            font-weight: 600;
+            box-shadow: 0 12px 30px rgba(249, 115, 22, 0.5);
+        }
+
+        .btn-primary span {
+            font-size: 10px;
+        }
+
+        /* ESTADO SEM PRODUTOS */
+
+        .empty-state {
+            margin-top: 32px;
+            border-radius: 24px;
+            border: 1px dashed rgba(255, 255, 255, 0.18);
+            padding: 28px 22px;
+            background: linear-gradient(135deg,
+                    rgba(10, 15, 43, 0.9),
+                    rgba(4, 4, 20, 0.9));
+            text-align: center;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .empty-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .empty-text {
+            font-size: 12px;
+            color: var(--text-soft);
+        }
+
+        .back-main {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .back-main a {
+            text-decoration: none;
+            color: var(--accent-strong);
+            font-size: 12px;
+        }
+
+        .back-main a span {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .back-main button {
+            margin-top: 10px;
+            border-radius: var(--radius-pill);
+            border: 1px solid rgba(252, 176, 69, 0.5);
+            background: transparent;
+            color: var(--accent-strong);
+            padding: 7px 18px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            cursor: pointer;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            margin-top: 38px;
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-soft);
+        }
+
+        .footer strong {
+            color: #fef3c7;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 720px) {
+            .page {
+                padding: 26px 16px 40px;
+            }
+
+            .title h1 {
+                font-size: 22px;
+            }
+
+            .toolbar {
+                align-items: stretch;
+            }
+
+            .toolbar-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .btn-primary {
+                width: 100%;
+            }
+
+            .cta-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header class="header">
+        <div class="brand-line">
+            <div class="brand-logo-wrap">
+                <img src="/assets/CosaNostraAI.ico" alt="CosaNostra BlackLink" class="brand-logo" />
+            </div>
+            <div>
+                <div class="brand-text-main">COSANOSTRA BLACKLINK</div>
+                <div class="brand-text-sub">black division • ultra premium</div>
+            </div>
+        </div>
+
+        <div class="title">
+            <h1>LOJA OFICIAL</h1>
+            <span>
+                @{{ username }} · Catálogo selecionado para o
+                <strong>BlackLink Ultra Premium</strong>.
+            </span>
+        </div>
+    </header>
+
+    <form method="get" class="toolbar">
+        <div class="search-box">
+            <div style="display:flex; flex-direction:column; justify-content:center; padding-right:4px;">
+                <span class="search-label">Buscar</span>
+            </div>
+            <input
+                type="text"
+                name="q"
+                value="{{ q }}"
+                placeholder="Buscar produto pelo nome..."
+            />
+        </div>
+
+        <div class="toolbar-right">
+            <div class="select">
+                <select name="order_by">
+                    <option value="id" {% if order_by == "id" %}selected{% endif %}>Recentes</option>
+                    <option value="name" {% if order_by == "name" %}selected{% endif %}>Nome</option>
+                    <option value="price" {% if order_by == "price" %}selected{% endif %}>Preço</option>
+                </select>
+            </div>
+            <div class="select">
+                <select name="direction">
+                    <option value="desc" {% if direction == "desc" %}selected{% endif %}>↓</option>
+                    <option value="asc" {% if direction == "asc" %}selected{% endif %}>↑</option>
+                </select>
+            </div>
+            <button class="btn-filter" type="submit">Filtrar</button>
+        </div>
+    </form>
+
+    {% if products and products|length > 0 %}
+        <div class="summary">
+            <strong>{{ products|length }}</strong>
+            produto(s) em destaque nesta loja.
+        </div>
+
+        <section class="grid">
+            {% for p in products %}
+            <article class="product-card">
+                <div class="product-inner">
+                    <div class="tag-destino">Destino BlackLink</div>
+
+                    <div class="thumb-wrap">
+                        <img src="{{ p.image_url }}" alt="{{ p.name }}" class="thumb" />
+                    </div>
+
+                    <div class="name">{{ p.name }}</div>
+                    <div class="price">R$ {{ p.price }}</div>
+                    <div class="subcopy">
+                        Oferta selecionada. Clique em <strong>Comprar direto</strong> para ir ao anúncio oficial
+                        ou em <strong>Ver detalhes</strong> para ver a vitrine completa.
+                    </div>
+
+                    <div class="cta-row">
+                        <a href="{{ url_for('user_product_detail', username=username, product_id=p.id) }}"
+                           class="btn btn-ghost">
+                            Ver detalhes
+                        </a>
+                        <a href="{{ url_for('product_out', product_id=p.id) }}"
+                           class="btn btn-primary">
+                            <span>Comprar direto</span>
+                        </a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <section class="empty-state">
+            <div class="empty-title">Nenhum produto disponível ainda.</div>
+            <div class="empty-text">
+                Em breve o catálogo oficial desta conta será ativado com novos produtos selecionados
+                pela <strong>CosaNostra Black Division</strong>.
+            </div>
+        </section>
+    {% endif %}
+
+    <div class="back-main">
+        <a href="{{ url_for('blacklink_page', username=username) }}">
+            <span>← Voltar ao BlackLink principal</span>
+        </a>
+    </div>
+
+    <footer class="footer">
+        Powered by <strong>CosaNostra BlackLink</strong> · Catálogo Profissional Black Division.
+    </footer>
+</div>
+</body>
+</html>

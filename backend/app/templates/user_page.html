@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ username | upper }} • CosaNostra BlackLink</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at top, #0b0b12, #050508 70%);
+            font-family: 'Inter', sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            margin-top: 60px;
+            width: 420px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(14px);
+            border-radius: 26px;
+            padding: 32px;
+            box-shadow: 0 0 40px rgba(255, 200, 90, 0.08);
+            border: 1px solid rgba(255, 200, 90, 0.12);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .header h2 {
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: #f4f1dc;
+            letter-spacing: -1px;
+            font-size: 20px;
+        }
+
+        .pill {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-size: 11px;
+            background: linear-gradient(90deg, #6a5acd, #8b5cf6);
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .username {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+            opacity: 0.85;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 22px;
+            border: 1px solid rgba(255, 200, 90, 0.15);
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+
+        .product-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 14px;
+            object-fit: cover;
+            display: block;
+            margin: 10px auto;
+            box-shadow: 0 0 18px rgba(255, 200, 90, 0.35);
+        }
+
+        .cta-big {
+            margin-top: 16px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 16px 18px;
+            border-radius: 14px;
+            background: linear-gradient(90deg, #ffbb44, #ff7b00);
+            font-size: 14px;
+            color: #000;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 0 25px rgba(255, 140, 0, 0.35);
+        }
+
+        .btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 14px;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid rgba(255, 200, 90, 0.15);
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+
+        .footer {
+            margin-top: 28px;
+            text-align: center;
+            opacity: 0.45;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+
+        <div class="header">
+            <h2>COSANOSTRA BLACKLINK</h2>
+            <span class="pill">BLACK DIVISION • ULTRA PREMIUM</span>
+        </div>
+
+        <div class="username">@{{ username }}</div>
+
+        {% if product %}
+        <div class="product-card">
+            <div class="product-title">🔥 PRODUTO DO DIA</div>
+
+            <img src="{{ product.image_url }}" class="product-img" />
+
+            <div class="product-title">
+                {{ product.name }} <br>
+                <strong>R$ {{ product.price }}</strong>
+            </div>
+
+            <a class="cta-big" href="{{ product.link }}" target="_blank">
+                Garantir meu Produto Agora
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- LINKS -->
+        <a class="btn" href="https://instagram.com/{{ username }}" target="_blank">📸 Instagram oficial</a>
+        <a class="btn" href="https://www.tiktok.com/@{{ username }}" target="_blank">🎬 TikTok • cortes & virais</a>
+        <a class="btn" href="https://youtube.com" target="_blank">📊 YouTube • inteligência & estratégia</a>
+
+        <!-- BOTÃO DO TELEGRAM CORRIGIDO -->
+        <a class="btn"
+           href="https://t.me/consigliere_v1_bot?start=from_blacklink"
+           target="_blank">
+           🔔 Canal Telegram (alertas)
+        </a>
+
+        <a class="btn" href="/blacklink/{{ username }}/produtos" target="_blank">🛒 Ver todos os produtos & ofertas</a>
+
+        <div class="footer">
+            Powered by <strong>CosaNostra Black Division</strong> — Links profissionais em modo Dominante.
+        </div>
+
+    </div>
+</body>
+</html>

@@ -1,3 +1,3 @@
-# Package de rotas (routers) do BlackLink
+from . import product, blacklinks
 
-from . import blacklinks, product  # noqa: F401
+__all__ = ["product", "blacklinks"]

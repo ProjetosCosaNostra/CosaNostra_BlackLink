@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel BlackLink • @{{ username }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --bg-main: #05040a;
+      --bg-alt: #090915;
+      --bg-soft: #10101f;
+      --gold: #fcb045;
+      --gold-soft: rgba(252, 176, 69, 0.22);
+      --gold-strong: #ffbf4d;
+      --text-main: #f5f5f7;
+      --text-soft: #aaaacc;
+      --text-mute: #6b6b8a;
+      --border-soft: rgba(255, 255, 255, 0.08);
+      --radius-xl: 24px;
+      --radius-pill: 999px;
+      --shadow-soft: 0 24px 70px rgba(0, 0, 0, 0.9);
+      --shadow-gold: 0 0 38px rgba(252, 176, 69, 0.4);
+      --transition-fast: 0.16s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, #211a3a 0, #05040a 50%, #000000 100%);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 32px 12px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background:
+        radial-gradient(circle at -10% -20%, rgba(252,176,69,0.2), transparent 55%),
+        radial-gradient(circle at 120% 130%, rgba(252,176,69,0.18), transparent 60%),
+        linear-gradient(150deg, #05030f, #090915);
+      border-radius: 28px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 22px 20px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% -10%, rgba(252, 176, 69, 0.12), transparent 55%),
+        radial-gradient(circle at 120% 120%, rgba(0, 0, 0, 0.9), transparent 60%);
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* HEADER SUPERIOR */
+
+    .top-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 16px;
+    }
+
+    .brand-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar-wrap {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      padding: 3px;
+      background: radial-gradient(circle at 30% 0, #ffffff, #fcb045, #7a4b11);
+      box-shadow: 0 0 18px rgba(252, 176, 69, 0.8);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: url("logo-blacklink.png") center/cover no-repeat;
+      border: 2px solid #05040a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      pointer-events: none;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-title {
+      font-size: 0.88rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold-strong);
+    }
+
+    .brand-sub {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .user-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--radius-pill);
+      padding: 4px 10px;
+      border: 1px solid rgba(252, 176, 69, 0.6);
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--text-soft);
+      font-size: 0.72rem;
+    }
+
+    .user-tag strong {
+      color: var(--gold-strong);
+    }
+
+    .pill-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--radius-pill);
+      padding: 4px 12px;
+      border: 1px solid rgba(0, 255, 148, 0.45);
+      background: rgba(0, 255, 148, 0.06);
+      color: #7fffd4;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .pill-status span.icon {
+      font-size: 0.9rem;
+    }
+
+    /* FORMULÁRIOS */
+
+    .section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-soft);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title span.icon {
+      font-size: 1.1rem;
+    }
+
+    .section-sub {
+      font-size: 0.78rem;
+      color: var(--text-mute);
+      margin-bottom: 12px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 12px;
+    }
+
+    @media (max-width: 700px) {
+      .form-grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .field label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: var(--text-soft);
+    }
+
+    .field small {
+      font-size: 0.72rem;
+      color: var(--text-mute);
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      border-radius: 12px;
+      border: 1px solid var(--border-soft);
+      background: rgba(5, 5, 15, 0.9);
+      color: var(--text-main);
+      padding: 7px 10px;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+    }
+
+    .field textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: rgba(252, 176, 69, 0.85);
+      box-shadow: 0 0 0 1px rgba(252, 176, 69, 0.4);
+      background: rgba(9, 9, 21, 0.98);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn-main {
+      border-radius: var(--radius-pill);
+      padding: 8px 16px;
+      border: 1px solid rgba(252, 176, 69, 0.95);
+      background: linear-gradient(90deg, #fcb045, #ff7b39);
+      color: #1f1305;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 14px 32px rgba(252, 176, 69, 0.6);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+    }
+
+    .btn-main:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+      box-shadow: 0 16px 40px rgba(252, 176, 69, 0.8);
+    }
+
+    .btn-ghost {
+      border-radius: var(--radius-pill);
+      padding: 8px 14px;
+      border: 1px solid var(--border-soft);
+      background: rgba(5, 5, 14, 0.9);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(252, 176, 69, 0.8);
+      color: var(--gold-strong);
+      background: rgba(12, 10, 20, 1);
+      transform: translateY(-1px);
+    }
+
+    .status-bar {
+      margin-top: 8px;
+      font-size: 0.76rem;
+      color: var(--text-mute);
+    }
+
+    .status-bar.ok {
+      color: #4ade80;
+    }
+
+    .status-bar.err {
+      color: #fb7185;
+    }
+
+    /* MESA DE NEGÓCIOS (PRODUTOS) */
+
+    .products-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: var(--radius-pill);
+      padding: 4px 10px;
+      border: 1px solid rgba(252, 176, 69, 0.4);
+      background: rgba(252, 176, 69, 0.08);
+      color: var(--gold-strong);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .product-list {
+      margin-top: 6px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: radial-gradient(circle at 0 0, rgba(252,176,69,0.16), rgba(5,5,14,0.95));
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 6px;
+    }
+
+    .product-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      background: rgba(7, 7, 18, 0.95);
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+    }
+
+    .product-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 0 0, rgba(252,176,69,0.7), rgba(0,0,0,0.95));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #1b1405;
+      flex-shrink: 0;
+      box-shadow: 0 0 16px rgba(252,176,69,0.85);
+    }
+
+    .product-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .product-title {
+      font-weight: 600;
+      font-size: 0.86rem;
+    }
+
+    .product-desc {
+      color: var(--text-soft);
+      font-size: 0.78rem;
+    }
+
+    .product-meta-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-top: 3px;
+      color: var(--gold-strong);
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .product-meta-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .product-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .product-actions button {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(5, 5, 16, 0.9);
+      color: var(--text-soft);
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .product-actions button:hover {
+      border-color: rgba(252,176,69,0.9);
+      color: var(--gold-strong);
+      background: rgba(12, 10, 22, 1);
+      transform: translateY(-1px);
+    }
+
+    .product-actions button.delete {
+      border-color: rgba(248, 113, 113, 0.7);
+      color: #fecaca;
+    }
+
+    .product-actions button.delete:hover {
+      background: rgba(127, 29, 29, 0.9);
+      border-color: #fca5a5;
+    }
+
+    .product-form {
+      margin-top: 10px;
+      padding: 10px 10px 8px;
+      border-radius: 16px;
+      border: 1px dashed rgba(252,176,69,0.5);
+      background: rgba(0,0,0,0.7);
+    }
+
+    .product-form-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+
+    .product-form-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr);
+      gap: 8px 10px;
+    }
+
+    @media (max-width: 700px) {
+      .product-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .product-form .field {
+      margin-bottom: 6px;
+    }
+
+    .badge-plan {
+      font-size: 0.74rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(252,176,69,0.7);
+      background: rgba(252,176,69,0.12);
+      color: var(--gold-strong);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .plan-line {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--text-mute);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <div class="layout">
+      <!-- COLUNA ESQUERDA: PERFIL + CTA + REDES -->
+      <section class="card">
+        <div class="card-inner">
+
+          <div class="top-header">
+            <div class="brand-left">
+              <div class="avatar-wrap">
+                <div class="avatar-inner"></div>
+                <div class="avatar-ring"></div>
+              </div>
+              <div class="brand-text">
+                <div class="brand-title">COSANOSTRA BLACKLINK</div>
+                <div class="brand-sub">BLACK & GOLD SOCIETY • DON PANEL</div>
+                <div class="plan-line">
+                  <span class="badge-plan" id="planLabel">PLANO: FREE</span>
+                  <span class="user-tag">
+                    @<strong id="usernameLabel">{{ username }}</strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="pill-status" id="statusLive">
+                <span class="icon">🟢</span>
+                <span>PAINEL ONLINE</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PERFIL -->
+          <div class="section-title">
+            <span class="icon">🧬</span>
+            <span>Perfil BlackLink</span>
+          </div>
+          <div class="section-sub">
+            Ajuste como sua marca aparece no link oficial: nome, bio, avatar e posicionamento.
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="display_name">Nome exibido</label>
+              <input id="display_name" type="text" placeholder="Ex: CosaNostra BlackLink" />
+            </div>
+
+            <div class="field">
+              <label for="avatar_url">URL do avatar / logo</label>
+              <input id="avatar_url" type="url" placeholder="https://.../sua-logo.png" />
+              <small>Se vazio, usamos o avatar padrão BlackLink.</small>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="bio">Bio / frase de posicionamento</label>
+            <textarea id="bio" placeholder="Ex: Construindo um império digital com IA, automação e produtos de alto valor."></textarea>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-main" id="btnSaveProfile">Salvar perfil</button>
+            <button class="btn-ghost" id="btnReloadProfile">Recarregar dados</button>
+          </div>
+          <div id="profileStatus" class="status-bar"></div>
+
+          <!-- CTA SUPREMO -->
+          <div class="section" style="margin-top: 22px;">
+            <div class="section-title">
+              <span class="icon">👑</span>
+              <span>CTA Supremo</span>
+            </div>
+            <div class="section-sub">
+              Esse é o botão principal da sua página (ex: Society, grupo fechado, canal principal).
+            </div>
+
+            <div class="field">
+              <label for="main_cta_label">Texto do botão principal</label>
+              <input id="main_cta_label" type="text" placeholder="Ex: Entrar na Família CosaNostra — Society" />
+            </div>
+
+            <div class="field">
+              <label for="main_cta_subtitle">Subtexto / reforço</label>
+              <input id="main_cta_subtitle" type="text" placeholder="Ex: Conteúdos privados e movimentos estratégicos." />
+            </div>
+
+            <div class="field">
+              <label for="main_cta_url">Link do CTA Supremo</label>
+              <input id="main_cta_url" type="url" placeholder="https://t.me/BlackGoldSociety" />
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-main" id="btnSaveCTA">Salvar CTA Supremo</button>
+            </div>
+            <div id="ctaStatus" class="status-bar"></div>
+          </div>
+
+          <!-- REDES OFICIAIS -->
+          <div class="section" style="margin-top: 22px;">
+            <div class="section-title">
+              <span class="icon">📡</span>
+              <span>Redes Oficiais</span>
+            </div>
+            <div class="section-sub">
+              Conecte suas redes principais. Elas aparecem como barra premium no final da página BlackLink.
+            </div>
+
+            <div class="form-grid-2">
+              <div class="field">
+                <label for="instagram_url">Instagram</label>
+                <input id="instagram_url" type="url" placeholder="https://www.instagram.com/..." />
+              </div>
+
+              <div class="field">
+                <label for="tiktok_url">TikTok</label>
+                <input id="tiktok_url" type="url" placeholder="https://www.tiktok.com/@..." />
+              </div>
+
+              <div class="field">
+                <label for="youtube_url">YouTube</label>
+                <input id="youtube_url" type="url" placeholder="https://www.youtube.com/@..." />
+              </div>
+
+              <div class="field">
+                <label for="telegram_url">Telegram</label>
+                <input id="telegram_url" type="url" placeholder="https://t.me/..." />
+              </div>
+
+              <div class="field">
+                <label for="linkedin_url">LinkedIn</label>
+                <input id="linkedin_url" type="url" placeholder="https://www.linkedin.com/in/..." />
+              </div>
+
+              <div class="field">
+                <label for="github_url">GitHub</label>
+                <input id="github_url" type="url" placeholder="https://github.com/..." />
+              </div>
+
+              <div class="field">
+                <label for="facebook_url">Facebook</label>
+                <input id="facebook_url" type="url" placeholder="https://www.facebook.com/..." />
+              </div>
+
+              <div class="field">
+                <label for="kwai_url">Kwai</label>
+                <input id="kwai_url" type="url" placeholder="https://kwai-video.com/u/..." />
+              </div>
+
+              <div class="field">
+                <label for="mercadolivre_url">Mercado Livre</label>
+                <input id="mercadolivre_url" type="url" placeholder="https://www.mercadolivre.com.br/..." />
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-main" id="btnSaveSocials">Salvar redes oficiais</button>
+            </div>
+            <div id="socialStatus" class="status-bar"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- COLUNA DIREITA: MESA DE NEGÓCIOS -->
+      <section class="card">
+        <div class="card-inner">
+
+          <div class="products-header">
+            <div>
+              <div class="section-title">
+                <span class="icon">💼</span>
+                <span>Mesa de Negócios</span>
+              </div>
+              <div class="section-sub">
+                Cadastre suas ofertas BlackLink: produtos, serviços, consultorias, ferramentas e setups.
+              </div>
+            </div>
+            <div class="tag-pill">
+              <span>MAX 10 PRODUTOS NO FREE</span>
+            </div>
+          </div>
+
+          <div id="productsList" class="product-list">
+            <!-- itens criados via JS -->
+          </div>
+
+          <div id="productsStatus" class="status-bar"></div>
+
+          <div class="product-form">
+            <div class="product-form-title">Adicionar / atualizar produto</div>
+
+            <div class="product-form-grid">
+              <div>
+                <div class="field">
+                  <label for="prod_title">Título do produto</label>
+                  <input id="prod_title" type="text" placeholder="Ex: CosaNostra Leads — Caçador de Clientes" />
+                </div>
+
+                <div class="field">
+                  <label for="prod_url">URL da oferta / checkout</label>
+                  <input id="prod_url" type="url" placeholder="https://..." />
+                </div>
+              </div>
+
+              <div>
+                <div class="field">
+                  <label for="prod_desc">Descrição curta</label>
+                  <textarea id="prod_desc" placeholder="Ex: Ferramenta para encontrar empresas, leads quentes e oportunidades em tempo real."></textarea>
+                </div>
+
+                <div class="field">
+                  <label for="prod_cta_label">Texto do botão</label>
+                  <input id="prod_cta_label" type="text" placeholder="Ex: Ver oferta" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid-2" style="margin-top: 4px;">
+              <div class="field">
+                <label for="prod_tag">Tag (ex: CN, AI)</label>
+                <input id="prod_tag" type="text" placeholder="CN / AI / VIP..." />
+              </div>
+
+              <div class="field">
+                <label for="prod_badge">Badge (ex: Ideal para fechar negócios)</label>
+                <input id="prod_badge" type="text" placeholder="Ex: Ideal para fechar negócios" />
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-main" id="btnAddProduct">Salvar produto</button>
+              <button class="btn-ghost" id="btnClearProductForm">Limpar campos</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+  <script>
+    // 🔧 CONFIGURAÇÕES BÁSICAS
+    const API_BASE = ""; // se backend estiver na mesma origem, deixa vazio. Se não, ex: "http://localhost:8000"
+
+    // username vindo do template (Jinja / FastAPI) ou fallback querystring
+    let USERNAME = "{{ username }}" || "";
+
+    if (!USERNAME || USERNAME.includes("{{")) {
+      // tenta ler da querystring ?username=...
+      const params = new URLSearchParams(window.location.search);
+      const u = params.get("username");
+      if (u) USERNAME = u;
+    }
+
+    const profileStatus = document.getElementById("profileStatus");
+    const ctaStatus = document.getElementById("ctaStatus");
+    const socialStatus = document.getElementById("socialStatus");
+    const productsStatus = document.getElementById("productsStatus");
+    const planLabel = document.getElementById("planLabel");
+    const usernameLabel = document.getElementById("usernameLabel");
+
+    function setStatus(el, msg, ok = true) {
+      if (!el) return;
+      el.textContent = msg || "";
+      el.classList.remove("ok", "err");
+      if (!msg) return;
+      el.classList.add(ok ? "ok" : "err");
+    }
+
+    async function fetchJSON(url, options = {}) {
+      const res = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        ...options,
+      });
+      if (!res.ok) {
+        let detail = "Falha na requisição.";
+        try {
+          const data = await res.json();
+          if (data && data.detail) detail = data.detail;
+        } catch (e) {}
+        throw new Error(detail);
+      }
+      return res.json();
+    }
+
+    // =========================
+    //   PERFIL / USER
+    // =========================
+
+    async function loadUser() {
+      if (!USERNAME) return;
+      try {
+        setStatus(profileStatus, "Carregando dados do usuário...", true);
+        const data = await fetchJSON(`${API_BASE}/blacklink/${USERNAME}`);
+
+        document.getElementById("display_name").value = data.display_name || "";
+        document.getElementById("bio").value = data.bio || "";
+        document.getElementById("avatar_url").value = data.avatar_url || "";
+
+        document.getElementById("main_cta_url").value = data.main_cta_url || "";
+        document.getElementById("main_cta_label").value = data.main_cta_label || "";
+        document.getElementById("main_cta_subtitle").value = data.main_cta_subtitle || "";
+
+        document.getElementById("instagram_url").value = data.instagram_url || "";
+        document.getElementById("tiktok_url").value = data.tiktok_url || "";
+        document.getElementById("youtube_url").value = data.youtube_url || "";
+        document.getElementById("telegram_url").value = data.telegram_url || "";
+        document.getElementById("linkedin_url").value = data.linkedin_url || "";
+        document.getElementById("github_url").value = data.github_url || "";
+        document.getElementById("facebook_url").value = data.facebook_url || "";
+        document.getElementById("kwai_url").value = data.kwai_url || "";
+        document.getElementById("mercadolivre_url").value = data.mercadolivre_url || "";
+
+        usernameLabel.textContent = data.username || USERNAME;
+
+        const plan = (data.plan || "free").toUpperCase();
+        planLabel.textContent = `PLANO: ${plan}`;
+        setStatus(profileStatus, "Dados carregados com sucesso.", true);
+      } catch (e) {
+        console.error(e);
+        setStatus(profileStatus, e.message || "Erro ao carregar usuário.", false);
+      }
+    }
+
+    async function saveProfile() {
+      if (!USERNAME) return;
+      try {
+        setStatus(profileStatus, "Salvando perfil...", true);
+
+        const payload = {
+          display_name: document.getElementById("display_name").value || null,
+          bio: document.getElementById("bio").value || null,
+          avatar_url: document.getElementById("avatar_url").value || null,
+        };
+
+        const data = await fetchJSON(`${API_BASE}/blacklink/${USERNAME}`, {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        });
+
+        usernameLabel.textContent = data.username || USERNAME;
+        const plan = (data.plan || "free").toUpperCase();
+        planLabel.textContent = `PLANO: ${plan}`;
+
+        setStatus(profileStatus, "Perfil atualizado com sucesso.", true);
+      } catch (e) {
+        console.error(e);
+        setStatus(profileStatus, e.message || "Erro ao salvar perfil.", false);
+      }
+    }
+
+    async function saveCTA() {
+      if (!USERNAME) return;
+      try {
+        setStatus(ctaStatus, "Salvando CTA...", true);
+
+        const payload = {
+          main_cta_url: document.getElementById("main_cta_url").value || null,
+          main_cta_label: document.getElementById("main_cta_label").value || null,
+          main_cta_subtitle: document.getElementById("main_cta_subtitle").value || null,
+        };
+
+        await fetchJSON(`${API_BASE}/blacklink/${USERNAME}`, {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        });
+
+        setStatus(ctaStatus, "CTA Supremo atualizado com sucesso.", true);
+      } catch (e) {
+        console.error(e);
+        setStatus(ctaStatus, e.message || "Erro ao salvar CTA.", false);
+      }
+    }
+
+    async function saveSocials() {
+      if (!USERNAME) return;
+      try {
+        setStatus(socialStatus, "Salvando redes...", true);
+
+        const payload = {
+          instagram_url: document.getElementById("instagram_url").value || null,
+          tiktok_url: document.getElementById("tiktok_url").value || null,
+          youtube_url: document.getElementById("youtube_url").value || null,
+          telegram_url: document.getElementById("telegram_url").value || null,
+          linkedin_url: document.getElementById("linkedin_url").value || null,
+          github_url: document.getElementById("github_url").value || null,
+          facebook_url: document.getElementById("facebook_url").value || null,
+          kwai_url: document.getElementById("kwai_url").value || null,
+          mercadolivre_url: document.getElementById("mercadolivre_url").value || null,
+        };
+
+        await fetchJSON(`${API_BASE}/blacklink/${USERNAME}`, {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        });
+
+        setStatus(socialStatus, "Redes oficiais atualizadas com sucesso.", true);
+      } catch (e) {
+        console.error(e);
+        setStatus(socialStatus, e.message || "Erro ao salvar redes.", false);
+      }
+    }
+
+    // =========================
+    //   PRODUTOS
+    // =========================
+
+    async function loadProducts() {
+      if (!USERNAME) return;
+      try {
+        setStatus(productsStatus, "Carregando produtos...", true);
+        const list = await fetchJSON(`${API_BASE}/product/${USERNAME}`);
+        renderProducts(list);
+        setStatus(productsStatus, `Foram encontrados ${list.length} produto(s).`, true);
+      } catch (e) {
+        console.error(e);
+        setStatus(productsStatus, e.message || "Erro ao carregar produtos.", false);
+      }
+    }
+
+    function renderProducts(products) {
+      const container = document.getElementById("productsList");
+      container.innerHTML = "";
+      if (!products || products.length === 0) {
+        container.innerHTML = `<div class="status-bar" style="padding:6px 8px;">Nenhum produto cadastrado ainda. Comece adicionando um abaixo.</div>`;
+        return;
+      }
+
+      products.forEach(prod => {
+        const div = document.createElement("div");
+        div.className = "product-item";
+
+        const badgeText = (prod.tag || "CN").toUpperCase().slice(0, 3);
+
+        div.innerHTML = `
+          <div class="product-badge">${badgeText}</div>
+          <div class="product-body">
+            <div class="product-title">${prod.title || "Sem título"}</div>
+            <div class="product-desc">${prod.description || ""}</div>
+            <div class="product-meta-line">
+              <div class="product-meta-left">
+                <span>${prod.badge || ""}</span>
+              </div>
+              <div class="product-actions">
+                <button data-id="${prod.id}" class="edit">Editar</button>
+                <button data-id="${prod.id}" class="delete">Remover</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        const btnEdit = div.querySelector("button.edit");
+        const btnDelete = div.querySelector("button.delete");
+
+        btnEdit.addEventListener("click", () => fillProductForm(prod));
+        btnDelete.addEventListener("click", () => deleteProduct(prod.id));
+
+        container.appendChild(div);
+      });
+    }
+
+    function fillProductForm(prod) {
+      document.getElementById("prod_title").value = prod.title || "";
+      document.getElementById("prod_desc").value = prod.description || "";
+      document.getElementById("prod_url").value = prod.url || "";
+      document.getElementById("prod_tag").value = prod.tag || "";
+      document.getElementById("prod_badge").value = prod.badge || "";
+      document.getElementById("prod_cta_label").value = prod.cta_label || "";
+
+      // guardar ID em dataset para futuro update (MVP aqui está só add + delete,
+      // mas já deixamos espaço para expandir se quiser)
+      document.getElementById("btnAddProduct").dataset.editId = prod.id;
+      setStatus(productsStatus, "Produto carregado no formulário. Edite e salve.", true);
+    }
+
+    function clearProductForm() {
+      document.getElementById("prod_title").value = "";
+      document.getElementById("prod_desc").value = "";
+      document.getElementById("prod_url").value = "";
+      document.getElementById("prod_tag").value = "";
+      document.getElementById("prod_badge").value = "";
+      document.getElementById("prod_cta_label").value = "";
+      document.getElementById("btnAddProduct").dataset.editId = "";
+      setStatus(productsStatus, "", true);
+    }
+
+    async function saveProduct() {
+      if (!USERNAME) return;
+
+      const title = document.getElementById("prod_title").value.trim();
+      const desc = document.getElementById("prod_desc").value.trim();
+      const url = document.getElementById("prod_url").value.trim();
+      const tag = document.getElementById("prod_tag").value.trim();
+      const badge = document.getElementById("prod_badge").value.trim();
+      const cta_label = document.getElementById("prod_cta_label").value.trim() || "Ver oferta";
+
+      if (!title || !url) {
+        setStatus(productsStatus, "Título e URL são obrigatórios.", false);
+        return;
+      }
+
+      const payload = {
+        title,
+        description: desc || null,
+        url,
+        tag: tag || null,
+        badge: badge || null,
+        cta_label,
+      };
+
+      const editId = document.getElementById("btnAddProduct").dataset.editId;
+
+      try {
+        setStatus(productsStatus, "Salvando produto...", true);
+
+        if (editId) {
+          // update (PATCH)
+          await fetchJSON(`${API_BASE}/product/edit/${editId}`, {
+            method: "PATCH",
+            body: JSON.stringify(payload),
+          });
+        } else {
+          // create
+          await fetchJSON(`${API_BASE}/product/${USERNAME}`, {
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+        }
+
+        setStatus(productsStatus, "Produto salvo com sucesso.", true);
+        clearProductForm();
+        await loadProducts();
+      } catch (e) {
+        console.error(e);
+        setStatus(productsStatus, e.message || "Erro ao salvar produto.", false);
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (!id) return;
+      if (!confirm("Tem certeza que deseja remover este produto da mesa?")) return;
+
+      try {
+        setStatus(productsStatus, "Removendo produto...", true);
+        await fetchJSON(`${API_BASE}/product/${id}`, {
+          method: "DELETE",
+        });
+        setStatus(productsStatus, "Produto removido com sucesso.", true);
+        await loadProducts();
+      } catch (e) {
+        console.error(e);
+        setStatus(productsStatus, e.message || "Erro ao remover produto.", false);
+      }
+    }
+
+    // =========================
+    // BIND DE BOTÕES
+    // =========================
+
+    document.getElementById("btnSaveProfile").addEventListener("click", (e) => {
+      e.preventDefault();
+      saveProfile();
+    });
+
+    document.getElementById("btnReloadProfile").addEventListener("click", (e) => {
+      e.preventDefault();
+      loadUser();
+    });
+
+    document.getElementById("btnSaveCTA").addEventListener("click", (e) => {
+      e.preventDefault();
+      saveCTA();
+    });
+
+    document.getElementById("btnSaveSocials").addEventListener("click", (e) => {
+      e.preventDefault();
+      saveSocials();
+    });
+
+    document.getElementById("btnAddProduct").addEventListener("click", (e) => {
+      e.preventDefault();
+      saveProduct();
+    });
+
+    document.getElementById("btnClearProductForm").addEventListener("click", (e) => {
+      e.preventDefault();
+      clearProductForm();
+    });
+
+    // =========================
+    // INIT
+    // =========================
+
+    (async function init() {
+      if (!USERNAME) {
+        setStatus(profileStatus, "Nenhum username detectado. Informe ?username= na URL ou passe via template.", false);
+        return;
+      }
+      await loadUser();
+      await loadProducts();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Painel Admin • BlackLink</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        :root {
+            --bg: #050509;
+            --bg-alt: #0b0b16;
+            --card-bg: #111119;
+            --gold: #f5c673;
+            --gold-soft: #f7d89b;
+            --text: #f5f5f5;
+            --muted: #b3b3c2;
+            --danger: #f97373;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                sans-serif;
+            background: radial-gradient(circle at top, #181827, var(--bg));
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 720px;
+            padding: 32px 16px;
+        }
+
+        .card {
+            background: radial-gradient(circle at top left, #1f2937, var(--card-bg));
+            border-radius: 24px;
+            padding: 28px 22px 22px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(245, 198, 115, 0.18);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 0, #a855f7, #4c1d95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-title {
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            font-size: 15px;
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--muted);
+        }
+
+        .env-pill {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            color: var(--muted);
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        input {
+            width: 100%;
+            padding: 9px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 1px rgba(245, 198, 115, 0.4);
+        }
+
+        .field {
+            margin-bottom: 10px;
+        }
+
+        .btn-main {
+            width: 100%;
+            border-radius: 999px;
+            border: 1px solid rgba(245, 198, 115, 0.9);
+            background: linear-gradient(90deg, #f5c673, #f97316);
+            color: #1f2933;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 12px 35px rgba(249, 115, 22, 0.45);
+        }
+
+        .btn-main:hover {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
+        }
+
+        .status {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .status.ok {
+            color: #4ade80;
+        }
+
+        .status.err {
+            color: var(--danger);
+        }
+
+        .preview-card {
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 14px 12px 12px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            font-size: 12px;
+        }
+
+        .preview-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .preview-top {
+            display: flex;
+            gap: 10px;
+        }
+
+        .preview-img-wrap {
+            width: 72px;
+            height: 72px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #020617;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-info-main {
+            flex: 1;
+        }
+
+        .preview-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .preview-price {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+
+        .preview-link {
+            font-size: 11px;
+            color: var(--muted);
+            word-break: break-all;
+            margin-top: 6px;
+        }
+
+        .preview-footer {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .preview-footer strong {
+            color: var(--gold-soft);
+        }
+
+        @media (max-width: 720px) {
+            .grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <main class="card">
+        <header class="brand">
+            <div class="brand-left">
+                <div class="brand-icon">💼</div>
+                <div class="brand-text">
+                    <div class="brand-title">Painel Admin • BlackLink</div>
+                    <div class="brand-sub">Produto do Dia global</div>
+                </div>
+            </div>
+            <div class="env-pill">LOCALHOST • v2</div>
+        </header>
+
+        <section class="section">
+            <div class="section-title">Configurar Produto do Dia</div>
+
+            <div class="grid">
+                <div>
+                    <div class="field">
+                        <label for="name">Nome do produto</label>
+                        <input id="name" type="text"
+                               placeholder="Ex.: Fone Bluetooth IPX5 — 100h bateria" />
+                    </div>
+
+                    <div class="field">
+                        <label for="price">Preço</label>
+                        <input id="price" type="text" placeholder="Ex.: R$ 86,33" />
+                    </div>
+
+                    <div class="field">
+                        <label for="image_url">URL da imagem (oficial / Meli)</label>
+                        <input id="image_url" type="url"
+                               placeholder="https://http2.mlstatic.com/..." />
+                    </div>
+
+                    <div class="field">
+                        <label for="link">Link de compra (afiliado)</label>
+                        <input id="link" type="url"
+                               placeholder="https://mercadolivre.com/sec/..." />
+                    </div>
+
+                    <button class="btn-main" id="btnSalvar">Salvar produto do dia</button>
+                    <div id="status" class="status"></div>
+                </div>
+
+                <div>
+                    <div class="preview-card">
+                        <div class="preview-title">Pré-visualização rápida</div>
+
+                        <div class="preview-top">
+                            <div class="preview-img-wrap">
+                                <img id="previewImg"
+                                     src=""
+                                     alt="Imagem do produto" />
+                            </div>
+                            <div class="preview-info-main">
+                                <div id="previewName" class="preview-name">Nome do produto</div>
+                                <div id="previewPrice" class="preview-price">R$ 0,00</div>
+                            </div>
+                        </div>
+
+                        <div id="previewLink" class="preview-link"></div>
+
+                        <div class="preview-footer">
+                            Página BlackLink exemplo:
+                            <br />
+                            <strong>http://127.0.0.1:8000/blacklink/seuuser</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:8000";
+
+    const nameInput = document.getElementById("name");
+    const priceInput = document.getElementById("price");
+    const imageInput = document.getElementById("image_url");
+    const linkInput = document.getElementById("link");
+
+    const statusEl = document.getElementById("status");
+    const previewName = document.getElementById("previewName");
+    const previewPrice = document.getElementById("previewPrice");
+    const previewImg = document.getElementById("previewImg");
+    const previewLink = document.getElementById("previewLink");
+
+    function setStatus(msg, ok = true) {
+        statusEl.textContent = msg;
+        statusEl.className = "status " + (ok ? "ok" : "err");
+    }
+
+    function buildImageProxyUrl(rawUrl) {
+        if (!rawUrl) return "";
+        return API_BASE + "/product/image-proxy?url=" + encodeURIComponent(rawUrl);
+    }
+
+    function atualizarPreviewLocal() {
+        previewName.textContent = nameInput.value || "Nome do produto";
+        previewPrice.textContent = priceInput.value || "R$ 0,00";
+        previewLink.textContent = linkInput.value || "";
+
+        const proxied = buildImageProxyUrl(imageInput.value);
+        previewImg.src = proxied || "";
+    }
+
+    async function carregarProdutoAtual() {
+        try {
+            const res = await fetch(API_BASE + "/product/");
+            if (!res.ok) {
+                console.log("Sem produto configurado ainda.");
+                return;
+            }
+            const data = await res.json();
+
+            nameInput.value = data.name || "";
+            priceInput.value = data.price || "";
+            imageInput.value = data.source_image_url || "";
+            linkInput.value = data.link || "";
+
+            atualizarPreviewLocal();
+        } catch (e) {
+            console.error("Erro ao carregar produto atual:", e);
+        }
+    }
+
+    async function salvarProduto() {
+        const payload = {
+            name: nameInput.value.trim(),
+            price: priceInput.value.trim(),
+            source_image_url: imageInput.value.trim(),
+            link: linkInput.value.trim(),
+        };
+
+        if (!payload.name || !payload.price || !payload.source_image_url || !payload.link) {
+            setStatus("Preencha todos os campos antes de salvar.", false);
+            return;
+        }
+
+        try {
+            setStatus("Salvando produto...", true);
+            const res = await fetch(API_BASE + "/product/", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.detail || "Erro ao salvar produto.");
+            }
+
+            const data = await res.json();
+            setStatus("Produto atualizado com sucesso.", true);
+
+            nameInput.value = data.name || "";
+            priceInput.value = data.price || "";
+            imageInput.value = data.source_image_url || "";
+            linkInput.value = data.link || "";
+
+            atualizarPreviewLocal();
+        } catch (e) {
+            console.error(e);
+            setStatus("Erro ao salvar. " + (e.message || "Falha desconhecida."), false);
+        }
+    }
+
+    document.getElementById("btnSalvar").addEventListener("click", (e) => {
+        e.preventDefault();
+        salvarProduto();
+    });
+
+    nameInput.addEventListener("input", atualizarPreviewLocal);
+    priceInput.addEventListener("input", atualizarPreviewLocal);
+    imageInput.addEventListener("input", atualizarPreviewLocal);
+    linkInput.addEventListener("input", atualizarPreviewLocal);
+
+    carregarProdutoAtual().then(() => atualizarPreviewLocal());
+</script>
+</body>
+</html>
