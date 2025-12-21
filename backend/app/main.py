@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import logging
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from threading import Thread
-from pathlib import Path
-import logging
 
 # ==================================================
 # LOG
@@ -15,10 +15,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("blacklink")
 
 # ==================================================
-# PATHS ABSOLUTOS
+# PATHS
 # ==================================================
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = BASE_DIR / "templates"
+
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # ==================================================
 # DATABASE
@@ -31,43 +33,18 @@ from app.database import Base, engine, ensure_sqlite_schema
 from app.config import settings
 
 # ==================================================
-# ROUTERS
-# ==================================================
-from app.routers import (
-    auth,
-    product,
-    blacklinks,
-    catalog,
-    admin,
-    panel,
-    payment,
-)
-
-# ==================================================
-# SERVICES
-# ==================================================
-from app.services.link_guardian import run_link_guardian
-
-# ==================================================
-# DB INIT
-# (create_all não cria colunas novas; ensure_sqlite_schema adiciona colunas faltantes)
-# IMPORTANTE: PASSO 3 adiciona colunas de ciclo de vida (plan_status, expires_at etc.)
-# ==================================================
-Base.metadata.create_all(bind=engine)
-ensure_sqlite_schema(engine)
-
-# ==================================================
-# APP
+# FASTAPI APP
 # ==================================================
 app = FastAPI(
     title="CosaNostra BlackLink",
-    version="5.2",  # PASSO 3
+    version="5.2",
+    openapi_url="/openapi.json",
+    docs_url="/docs",
+    redoc_url=None,
 )
 
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
-
 # ==================================================
-# CORS
+# MIDDLEWARE
 # ==================================================
 app.add_middleware(
     CORSMiddleware,
@@ -78,51 +55,61 @@ app.add_middleware(
 )
 
 # ==================================================
-# HEALTH
+# ROUTERS (IMPORTAÇÃO EXPLÍCITA)
 # ==================================================
-@app.get("/")
-def health():
-    return {"status": "ok", "service": "blacklink"}
+from app.routers import (
+    auth,
+    product,
+    blacklinks,
+    catalog,
+    admin,
+    panel,
+    payment,
+    plan,
+    webhook,   # 🔥 OBRIGATÓRIO — ESTAVA FALTANDO
+)
 
 # ==================================================
-# CHECKOUT
+# ROUTERS (REGISTRO)
 # ==================================================
-@app.get("/checkout", response_class=HTMLResponse)
-def checkout(request: Request):
-    logger.info(f"Renderizando checkout em: {TEMPLATES_DIR}")
-    return templates.TemplateResponse(
-        "payment.html",
-        {
-            "request": request,
-            "public_key": settings.MP_PUBLIC_KEY,
-        }
-    )
+app.include_router(auth.router, tags=["Auth"])
+app.include_router(product.router, tags=["Product"])
+app.include_router(blacklinks.router, tags=["BlackLink"])
+app.include_router(catalog.router, tags=["Catalog"])
+app.include_router(admin.router, tags=["Admin"])
+app.include_router(panel.router, tags=["Panel"])
+app.include_router(payment.router, tags=["Payment"])
+app.include_router(plan.router, tags=["Plan"])
 
-# ==================================================
-# ROUTERS
-# IMPORTANTE:
-# - auth.router já tem prefix="/auth"
-# - admin.router já tem prefix="/admin"
-# - product.router deve ter prefix="/product"
-# - panel.router já trabalha com /painel...
-# - payment.router tem prefix="/payment"
-# ==================================================
-app.include_router(auth.router)
-app.include_router(product.router)
-app.include_router(blacklinks.router)
-app.include_router(catalog.router)
-app.include_router(admin.router)
-app.include_router(panel.router)
-app.include_router(payment.router)
+# 🔥🔥🔥 WEBHOOK MERCADO PAGO 🔥🔥🔥
+app.include_router(
+    webhook.router,
+    prefix="/webhook",
+    tags=["Webhook"],
+)
 
 # ==================================================
 # STARTUP
 # ==================================================
 @app.on_event("startup")
-def startup():
-    try:
-        thread = Thread(target=run_link_guardian, daemon=True)
-        thread.start()
-        logger.info("Link Guardian iniciado")
-    except Exception as e:
-        logger.error(f"Guardian falhou: {e}")
+def on_startup():
+    logger.info("🚀 Iniciando CosaNostra BlackLink")
+    ensure_sqlite_schema()
+    logger.info("✅ Banco de dados pronto")
+
+# ==================================================
+# HEALTHCHECK
+# ==================================================
+@app.get("/", tags=["Health"])
+def health():
+    return {"status": "ok", "service": "blacklink"}
+
+# ==================================================
+# FRONTEND TEMPLATE (OPCIONAL)
+# ==================================================
+@app.get("/ui", response_class=HTMLResponse)
+def ui_home(request: Request):
+    return templates.TemplateResponse(
+        "user_page.html",
+        {"request": request},
+    )
