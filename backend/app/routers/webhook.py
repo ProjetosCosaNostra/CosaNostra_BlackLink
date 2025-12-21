@@ -25,12 +25,30 @@ router = APIRouter(prefix="/webhook", tags=["Webhook"])
 # ============================================================
 def _verify_webhook_secret(x_webhook_secret: Optional[str]) -> None:
     """
-    Se settings.MP_WEBHOOK_SECRET estiver definido, exige header:
+    Se settings.MP_WEBHOOK_SECRET estiver definido, exige:
     X-Webhook-Secret: <segredo>
     """
-    if getattr(settings, "MP_WEBHOOK_SECRET", None):
-        if not x_webhook_secret or x_webhook_secret != settings.MP_WEBHOOK_SECRET:
+    secret = getattr(settings, "MP_WEBHOOK_SECRET", None)
+    if secret:
+        if not x_webhook_secret or x_webhook_secret != secret:
             raise HTTPException(status_code=403, detail="Webhook não autorizado")
+
+
+# ============================================================
+# 🧪 TEST MODE
+# ============================================================
+def _is_test_mode() -> bool:
+    """
+    Liga modo teste via env var:
+    WEBHOOK_TEST_MODE=1 (Railway Variables)
+    """
+    v = getattr(settings, "WEBHOOK_TEST_MODE", None)
+    if v is None:
+        # fallback (caso settings não tenha)
+        return False
+    if isinstance(v, bool):
+        return v
+    return str(v).strip().lower() in ("1", "true", "yes", "on")
 
 
 # ============================================================
@@ -105,7 +123,6 @@ def _parse_external_reference(external_reference: str) -> Tuple[str, str, int]:
 
     username = parts[0].strip()
     plan_id = normalize_plan(parts[1].strip())
-
     try:
         months = int(parts[2])
     except Exception:
@@ -160,7 +177,7 @@ def _mark_payment_processed_best_effort(db: Session, payment_id: str) -> None:
 
 
 # ============================================================
-# 📩 WEBHOOK MERCADO PAGO
+# 📩 WEBHOOK MERCADO PAGO (PRODUÇÃO + TEST MODE)
 # ============================================================
 @router.post("/mercadopago")
 async def mercadopago_webhook(
@@ -169,19 +186,15 @@ async def mercadopago_webhook(
     x_webhook_secret: str | None = Header(default=None),
 ):
     """
-    MODO REAL:
+    Produção:
       - extrai payment_id
-      - consulta API Mercado Pago (MP_ACCESS_TOKEN)
-      - confirma approved
-      - lê external_reference (username:plan:months)
-      - aplica plano
+      - consulta MercadoPago API (sdk) e valida "approved"
+      - usa external_reference real do pagamento
 
-    MODO TESTE (WEBHOOK_TEST_MODE=True):
-      - NÃO chama Mercado Pago
-      - usa campos do payload:
-          status: "approved"
-          external_reference: "username:plan:months"
-          payer_email: "email@..."
+    Test mode (WEBHOOK_TEST_MODE=1):
+      - NÃO chama sdk
+      - usa o payload (status/external_reference/payer_email)
+      - permite testar sem gastar 1 real
     """
     _verify_webhook_secret(x_webhook_secret)
 
@@ -190,43 +203,51 @@ async def mercadopago_webhook(
     except Exception:
         raise HTTPException(status_code=400, detail="JSON inválido")
 
-    # Aceita variações: type/topic
+    # Se não vier type/topic, no teste a gente aceita mesmo assim
     event_type = payload.get("type") or payload.get("topic") or "payment"
 
     if event_type not in ("payment", "merchant_order"):
         return {"status": "ignored", "reason": "Evento não suportado"}
 
-    payment_id = _extract_payment_id(payload) or "TEST"
-    if not payment_id:
-        raise HTTPException(status_code=400, detail="payment_id ausente no webhook")
+    payment_id = _extract_payment_id(payload) or "NO-ID"
 
-    # Idempotência best-effort
-    if _is_payment_already_processed_best_effort(db, payment_id):
+    # Idempotência best-effort (se existir tabela)
+    if payment_id != "NO-ID" and _is_payment_already_processed_best_effort(db, payment_id):
         return {"status": "ignored", "reason": "Pagamento já processado", "payment_id": payment_id}
 
     # ========================================================
-    # ✅ MODO TESTE (sem Mercado Pago)
+    # 🧪 TEST MODE: usa o payload direto
     # ========================================================
-    if getattr(settings, "WEBHOOK_TEST_MODE", False):
+    if _is_test_mode():
         status = (payload.get("status") or "").strip().lower()
         external_reference = (payload.get("external_reference") or "").strip()
-        payer_email = (payload.get("payer_email") or "").strip()
 
         if status != "approved":
-            return {"status": "ignored", "reason": "TEST_MODE: Pagamento não aprovado", "payment_id": payment_id}
+            return {
+                "status": "ignored",
+                "reason": "TEST MODE: status não aprovado",
+                "payment_id": payment_id,
+                "received_status": status,
+            }
 
         username, plan_id, months = _parse_external_reference(external_reference)
 
-        user = db.query(models.BlackLinkUser).filter(models.BlackLinkUser.username == username).first()
+        user = (
+            db.query(models.BlackLinkUser)
+            .filter(models.BlackLinkUser.username == username)
+            .first()
+        )
         if not user:
             raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
         apply_paid_plan(user=user, plan_id=plan_id, months=months)
 
-        if payer_email and not user.email:
+        payer_email = payload.get("payer_email")
+        if payer_email and not getattr(user, "email", None):
             user.email = payer_email
 
-        _mark_payment_processed_best_effort(db, payment_id)
+        if payment_id != "NO-ID":
+            _mark_payment_processed_best_effort(db, payment_id)
 
         db.add(user)
         db.commit()
@@ -242,32 +263,35 @@ async def mercadopago_webhook(
         }
 
     # ========================================================
-    # 🔥 MODO REAL (com Mercado Pago)
+    # PRODUÇÃO: consulta Mercado Pago — fonte de verdade
     # ========================================================
-    if not settings.MP_ACCESS_TOKEN:
+    if not getattr(settings, "MP_ACCESS_TOKEN", None):
         raise HTTPException(status_code=500, detail="MP_ACCESS_TOKEN ausente no servidor")
 
-    # Import local pra não quebrar import se lib não estiver presente em dev
-    try:
-        import mercadopago
-    except Exception:
-        raise HTTPException(status_code=500, detail="Dependência mercadopago não instalada no servidor")
+    if payment_id == "NO-ID":
+        raise HTTPException(status_code=400, detail="payment_id ausente no webhook")
+
+    import mercadopago
 
     sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
-
     payment = sdk.payment().get(payment_id)
+
     if payment.get("status") != 200:
         raise HTTPException(status_code=400, detail="Pagamento não encontrado no Mercado Pago")
 
     payment_data = payment.get("response") or {}
 
-    if (payment_data.get("status") or "").lower() != "approved":
+    if payment_data.get("status") != "approved":
         return {"status": "ignored", "reason": "Pagamento não aprovado", "payment_id": payment_id}
 
     external_reference = payment_data.get("external_reference") or ""
     username, plan_id, months = _parse_external_reference(external_reference)
 
-    user = db.query(models.BlackLinkUser).filter(models.BlackLinkUser.username == username).first()
+    user = (
+        db.query(models.BlackLinkUser)
+        .filter(models.BlackLinkUser.username == username)
+        .first()
+    )
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
@@ -275,7 +299,7 @@ async def mercadopago_webhook(
 
     payer = payment_data.get("payer") or {}
     payer_email = payer.get("email")
-    if payer_email and not user.email:
+    if payer_email and not getattr(user, "email", None):
         user.email = payer_email
 
     _mark_payment_processed_best_effort(db, payment_id)
@@ -286,7 +310,7 @@ async def mercadopago_webhook(
 
     return {
         "status": "processed",
-        "mode": "real",
+        "mode": "production",
         "payment_id": payment_id,
         "username": user.username,
         "plan": user.plan,

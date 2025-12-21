@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 # ==================================================
 # DATABASE
 # ==================================================
-from app.database import engine, ensure_sqlite_schema
+from app.database import ensure_sqlite_schema
 
 # ==================================================
 # SETTINGS
@@ -54,7 +54,7 @@ app.add_middleware(
 )
 
 # ==================================================
-# ROUTERS (IMPORT SEGURO — NÃO DEPENDE DO __init__.py)
+# ROUTERS (imports diretos, sem depender do __init__.py exportar nomes)
 # ==================================================
 import app.routers.auth as auth
 import app.routers.product as product
@@ -63,11 +63,20 @@ import app.routers.catalog as catalog
 import app.routers.admin as admin
 import app.routers.panel as panel
 import app.routers.payment as payment
-import app.routers.plan as plan
+
+# Alguns projetos têm plan.py, outros não (pra não derrubar deploy)
+try:
+    import app.routers.plan as plan  # type: ignore
+    _HAS_PLAN = True
+except Exception as e:
+    logger.warning(f"⚠️ Router plan indisponível: {e}")
+    _HAS_PLAN = False
+
+# Webhook (obrigatório)
 import app.routers.webhook as webhook
 
 # ==================================================
-# ROUTERS (REGISTRO)
+# ROUTERS (registro)
 # ==================================================
 app.include_router(auth.router, tags=["Auth"])
 app.include_router(product.router, tags=["Product"])
@@ -76,10 +85,12 @@ app.include_router(catalog.router, tags=["Catalog"])
 app.include_router(admin.router, tags=["Admin"])
 app.include_router(panel.router, tags=["Panel"])
 app.include_router(payment.router, tags=["Payment"])
-app.include_router(plan.router, tags=["Plan"])
 
-# Webhook router já tem prefix="/webhook" dentro dele.
-# Aqui NÃO coloca prefix, pra não virar /webhook/webhook/...
+if _HAS_PLAN:
+    app.include_router(plan.router, tags=["Plan"])
+
+# ✅ WEBHOOK: o router já tem prefix="/webhook" dentro do webhook.py
+# então aqui entra SEM prefix extra
 app.include_router(webhook.router, tags=["Webhook"])
 
 # ==================================================
@@ -88,7 +99,7 @@ app.include_router(webhook.router, tags=["Webhook"])
 @app.on_event("startup")
 def on_startup():
     logger.info("🚀 Iniciando CosaNostra BlackLink")
-    ensure_sqlite_schema(engine)
+    ensure_sqlite_schema()
     logger.info("✅ Banco de dados pronto")
 
 # ==================================================
@@ -99,7 +110,7 @@ def health():
     return {"status": "ok", "service": "blacklink"}
 
 # ==================================================
-# FRONTEND TEMPLATE (OPCIONAL)
+# FRONTEND TEMPLATE (opcional)
 # ==================================================
 @app.get("/ui", response_class=HTMLResponse)
 def ui_home(request: Request):

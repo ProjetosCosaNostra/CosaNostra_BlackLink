@@ -1,23 +1,10 @@
-from __future__ import annotations
+"""
+app.routers package
 
-from . import auth
-from . import product
-from . import blacklinks
-from . import catalog
-from . import admin
-from . import panel
-from . import payment
-from . import plan
-from . import webhook
+⚠️ Não importe submódulos aqui.
 
-__all__ = [
-    "auth",
-    "product",
-    "blacklinks",
-    "catalog",
-    "admin",
-    "panel",
-    "payment",
-    "plan",
-    "webhook",
-]
+Motivo:
+- Importar routers dentro do __init__.py pode causar ImportError em cascata
+  (ex: quando um router importa models que ainda não carregaram corretamente),
+  e derruba o container no startup (Railway/Uvicorn).
+"""
