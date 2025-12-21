@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.database import get_db
-from app.models import Product, User
+from app.models import BlackLinkProduct, BlackLinkUser
 from app.schemas import (
     ProductCreate,
     ProductUpdate,
@@ -25,7 +25,7 @@ PLAN_PRODUCT_LIMITS = {
 }
 
 
-def check_product_limit(user: User, db: Session):
+def check_product_limit(user: BlackLinkUser, db: Session):
     plan = (user.plan or "free").lower()
     limit = PLAN_PRODUCT_LIMITS.get(plan, 3)
 
@@ -34,8 +34,8 @@ def check_product_limit(user: User, db: Session):
         return
 
     total_products = (
-        db.query(Product)
-        .filter(Product.owner_id == user.id)
+        db.query(BlackLinkProduct)
+        .filter(BlackLinkProduct.owner_id == user.id)
         .count()
     )
 
@@ -72,14 +72,18 @@ def list_products_for_user(
     username: str,
     db: Session = Depends(get_db)
 ):
-    user = db.query(User).filter(User.username == username).first()
+    user = (
+        db.query(BlackLinkUser)
+        .filter(BlackLinkUser.username == username)
+        .first()
+    )
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     products = (
-        db.query(Product)
-        .filter(Product.owner_id == user.id)
-        .order_by(Product.id.desc())
+        db.query(BlackLinkProduct)
+        .filter(BlackLinkProduct.owner_id == user.id)
+        .order_by(BlackLinkProduct.id.desc())
         .all()
     )
 
@@ -96,14 +100,18 @@ def create_product_for_user(
     payload: ProductCreate,
     db: Session = Depends(get_db),
 ):
-    user = db.query(User).filter(User.username == username).first()
+    user = (
+        db.query(BlackLinkUser)
+        .filter(BlackLinkUser.username == username)
+        .first()
+    )
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
     # 🔒 BLOQUEIO POR PLANO (com mensagem de upgrade)
     check_product_limit(user, db)
 
-    product = Product(
+    product = BlackLinkProduct(
         owner_id=user.id,
         **payload.model_dump()
     )
@@ -125,7 +133,11 @@ def update_product(
     payload: ProductUpdate,
     db: Session = Depends(get_db),
 ):
-    product = db.query(Product).filter(Product.id == product_id).first()
+    product = (
+        db.query(BlackLinkProduct)
+        .filter(BlackLinkProduct.id == product_id)
+        .first()
+    )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
@@ -149,7 +161,11 @@ def delete_product(
     product_id: int,
     db: Session = Depends(get_db),
 ):
-    product = db.query(Product).filter(Product.id == product_id).first()
+    product = (
+        db.query(BlackLinkProduct)
+        .filter(BlackLinkProduct.id == product_id)
+        .first()
+    )
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
