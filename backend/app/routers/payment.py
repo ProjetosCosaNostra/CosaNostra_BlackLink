@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import os
 from datetime import datetime, timezone
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
@@ -9,10 +9,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import models
 from app.config import settings
-from app.schemas import (
-    PaymentProcessRequest,
-    PaymentProcessResponse,
-)
+from app.schemas import PaymentProcessRequest, PaymentProcessResponse
 from app.services.plan_catalog import (
     get_plan,
     normalize_plan,
@@ -89,10 +86,22 @@ def create_checkout_preference(
     """
     Cria uma PREFERENCE do Mercado Pago.
     Roda em SANDBOX ou PRODUÇÃO dependendo do token.
+
+    IMPORTANTE:
+    - external_reference precisa ser consistente com o webhook:
+        username:plan:months
+    - notification_url aponta para /webhook/mercadopago (settings.MP_WEBHOOK_URL)
     """
 
+    username = (payload.username or "").strip().lower()
     plan_id = normalize_plan(payload.plan)
     months = payload.months or 1
+
+    if not username:
+        raise HTTPException(status_code=400, detail="username é obrigatório")
+
+    if months < 1 or months > 24:
+        raise HTTPException(status_code=400, detail="months inválido (1..24)")
 
     if plan_id == PLAN_FREE:
         raise HTTPException(status_code=400, detail="Plano FREE não é vendável")
@@ -104,7 +113,7 @@ def create_checkout_preference(
 
     user = (
         db.query(models.BlackLinkUser)
-        .filter(models.BlackLinkUser.username == payload.username)
+        .filter(models.BlackLinkUser.username == username)
         .first()
     )
 
@@ -115,6 +124,12 @@ def create_checkout_preference(
         raise HTTPException(
             status_code=500,
             detail="Mercado Pago não configurado (MP_ACCESS_TOKEN ausente)",
+        )
+
+    if not settings.MP_WEBHOOK_URL:
+        raise HTTPException(
+            status_code=500,
+            detail="MP_WEBHOOK_URL ausente (notification_url do Mercado Pago)",
         )
 
     import mercadopago
@@ -135,6 +150,7 @@ def create_checkout_preference(
         "payer": {
             "email": payload.email or user.email or "cliente@blacklink.app"
         },
+        # ✅ webhook parseia "username:plan:months"
         "external_reference": f"{user.username}:{plan.id}:{months}",
         "notification_url": settings.MP_WEBHOOK_URL,
         "back_urls": {
@@ -159,11 +175,14 @@ def create_checkout_preference(
         "preference_id": pref["id"],
         "init_point": pref.get("init_point"),
         "sandbox_init_point": pref.get("sandbox_init_point"),
+        # útil para debug:
+        "external_reference": preference_data["external_reference"],
+        "notification_url": preference_data["notification_url"],
     }
 
 
 # ============================================================
-# ENDPOINT 2 — PROCESSAMENTO (PRODUÇÃO-SAFE)
+# ENDPOINT 2 — PROCESSAMENTO (PRODUÇÃO-SAFE) — FALLBACK/ADMIN
 # ============================================================
 @router.post("/process", response_model=PaymentProcessResponse)
 def process_payment(
@@ -174,6 +193,9 @@ def process_payment(
     """
     Processa pagamento aprovado.
 
+    Uso recomendado:
+    - Fallback/admin ou processamento manual controlado.
+
     Em PRODUÇÃO:
     - Exige payment_id
     - Valida pagamento no Mercado Pago
@@ -182,15 +204,22 @@ def process_payment(
     - Impede ativação manual/fake
     """
 
+    username = (payload.username or "").strip().lower()
     plan_id = normalize_plan(payload.plan)
     months = payload.months or 1
+
+    if not username:
+        raise HTTPException(status_code=400, detail="username é obrigatório")
+
+    if months < 1 or months > 24:
+        raise HTTPException(status_code=400, detail="months inválido (1..24)")
 
     if plan_id == PLAN_FREE:
         raise HTTPException(status_code=400, detail="Plano FREE não é vendável")
 
     user = (
         db.query(models.BlackLinkUser)
-        .filter(models.BlackLinkUser.username == payload.username)
+        .filter(models.BlackLinkUser.username == username)
         .first()
     )
 

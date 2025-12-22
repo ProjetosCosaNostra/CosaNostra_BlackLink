@@ -44,7 +44,6 @@ def _is_test_mode() -> bool:
     """
     v = getattr(settings, "WEBHOOK_TEST_MODE", None)
     if v is None:
-        # fallback (caso settings não tenha)
         return False
     if isinstance(v, bool):
         return v
@@ -95,6 +94,13 @@ def apply_paid_plan(
 # 🧩 Helpers
 # ============================================================
 def _extract_payment_id(payload: Dict[str, Any]) -> Optional[str]:
+    """
+    MercadoPago envia variações. Tentamos cobrir todas:
+    - payload.data.id
+    - payload.id
+    - payload.data_id
+    - payload.resource (url) -> último segmento
+    """
     data = payload.get("data") or {}
     pid = data.get("id") or payload.get("id") or payload.get("data_id")
     if pid:
@@ -112,7 +118,8 @@ def _extract_payment_id(payload: Dict[str, Any]) -> Optional[str]:
 
 def _parse_external_reference(external_reference: str) -> Tuple[str, str, int]:
     """
-    Esperado: username:plan:months
+    Esperado (compatível com /payment/checkout):
+      username:plan:months
     """
     if not external_reference or ":" not in external_reference:
         raise HTTPException(status_code=400, detail="external_reference inválido")
@@ -121,7 +128,7 @@ def _parse_external_reference(external_reference: str) -> Tuple[str, str, int]:
     if len(parts) != 3:
         raise HTTPException(status_code=400, detail="external_reference inválido")
 
-    username = parts[0].strip()
+    username = parts[0].strip().lower()
     plan_id = normalize_plan(parts[1].strip())
     try:
         months = int(parts[2])
@@ -132,13 +139,18 @@ def _parse_external_reference(external_reference: str) -> Tuple[str, str, int]:
         raise HTTPException(status_code=400, detail="username inválido no external_reference")
     if plan_id == PLAN_FREE:
         raise HTTPException(status_code=400, detail="Plano FREE não é vendável")
-    if months < 1:
-        raise HTTPException(status_code=400, detail="months inválido")
+    if months < 1 or months > 24:
+        raise HTTPException(status_code=400, detail="months inválido (1..24)")
 
     return username, plan_id, months
 
 
 def _is_payment_already_processed_best_effort(db: Session, payment_id: str) -> bool:
+    """
+    Idempotência best-effort:
+    - se existir algum model/tabela que guarde payment_id, usa.
+    - se não existir, retorna False e segue o fluxo (não quebra).
+    """
     candidates = ["ProcessedPayment", "Payment", "PaymentEvent", "MercadoPagoPayment"]
     for name in candidates:
         model_cls = getattr(models, name, None)
@@ -157,6 +169,10 @@ def _is_payment_already_processed_best_effort(db: Session, payment_id: str) -> b
 
 
 def _mark_payment_processed_best_effort(db: Session, payment_id: str) -> None:
+    """
+    Tenta registrar payment_id em algum model existente.
+    Se não existir, ignora silenciosamente.
+    """
     candidates = ["ProcessedPayment", "Payment", "PaymentEvent", "MercadoPagoPayment"]
     for name in candidates:
         model_cls = getattr(models, name, None)
@@ -203,11 +219,12 @@ async def mercadopago_webhook(
     except Exception:
         raise HTTPException(status_code=400, detail="JSON inválido")
 
-    # Se não vier type/topic, no teste a gente aceita mesmo assim
-    event_type = payload.get("type") or payload.get("topic") or "payment"
+    # MercadoPago pode mandar 'type' (payment) ou 'topic' (payment/merchant_order)
+    event_type = (payload.get("type") or payload.get("topic") or "payment").strip()
 
+    # aceitamos payment e merchant_order (merchant_order às vezes aponta para pagamento)
     if event_type not in ("payment", "merchant_order"):
-        return {"status": "ignored", "reason": "Evento não suportado"}
+        return {"status": "ignored", "reason": "Evento não suportado", "event_type": event_type}
 
     payment_id = _extract_payment_id(payload) or "NO-ID"
 
@@ -225,7 +242,8 @@ async def mercadopago_webhook(
         if status != "approved":
             return {
                 "status": "ignored",
-                "reason": "TEST MODE: status não aprovado",
+                "mode": "test",
+                "reason": "status não aprovado",
                 "payment_id": payment_id,
                 "received_status": status,
             }
@@ -281,10 +299,10 @@ async def mercadopago_webhook(
 
     payment_data = payment.get("response") or {}
 
-    if payment_data.get("status") != "approved":
+    if (payment_data.get("status") or "").lower() != "approved":
         return {"status": "ignored", "reason": "Pagamento não aprovado", "payment_id": payment_id}
 
-    external_reference = payment_data.get("external_reference") or ""
+    external_reference = (payment_data.get("external_reference") or "").strip()
     username, plan_id, months = _parse_external_reference(external_reference)
 
     user = (
