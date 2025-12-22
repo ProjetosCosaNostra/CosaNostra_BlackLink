@@ -77,7 +77,6 @@ class UserBase(BaseModel):
 
     plan: Optional[str] = "free"
 
-    # STATUS DE PLANO — sempre datetime real (ORM-safe)
     plan_status: Optional[str] = "active"
     plan_started_at: Optional[datetime] = None
     plan_expires_at: Optional[datetime] = None
@@ -86,10 +85,6 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    """
-    Entrada pode mandar datetime em ISO.
-    Pydantic converte automaticamente.
-    """
     pass
 
 
@@ -128,8 +123,14 @@ class UserOut(UserBase):
 
 
 # ============================================================
-# ADMIN / INGEST
+# ADMIN
 # ============================================================
+class AdminCreateUser(BaseModel):
+    username: str
+    email: str
+    plan: Optional[str] = "free"
+
+
 class AdminIngestRequest(BaseModel):
     username: str
     ml_url: str
@@ -137,19 +138,13 @@ class AdminIngestRequest(BaseModel):
 
 
 # ============================================================
-# PAYMENTS (PRODUÇÃO-SAFE)
+# PAYMENTS
 # ============================================================
 class PaymentProcessRequest(BaseModel):
-    """
-    - Em SANDBOX: payment_id pode ser omitido
-    - Em PRODUÇÃO: payment_id é OBRIGATÓRIO
-    """
     username: str
-    plan: str  # pro | don
+    plan: str
     months: int = 1
     email: Optional[str] = None
-
-    # CRÍTICO PARA PRODUÇÃO
     payment_id: Optional[str] = None
 
 
@@ -160,3 +155,8 @@ class PaymentProcessResponse(BaseModel):
     plan: str
     plan_status: str
     plan_expires_at: Optional[datetime] = None
+
+class AdminCreateUser(BaseModel):
+    username: str
+    email: str
+    plan: Optional[str] = "free"

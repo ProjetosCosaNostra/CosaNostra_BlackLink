@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Optional
 
 from app.database import get_db
 from app.models import BlackLinkUser
+from app.schemas import AdminCreateUser  # ✅ novo schema (JSON body)
 
 router = APIRouter(
     prefix="/admin",
@@ -14,22 +16,24 @@ router = APIRouter(
 
 # ============================================================
 # POST /admin/create-user
-# Criação manual de usuário (BOOTSTRAP / MVP)
+# Criação profissional via JSON (SaaS padrão)
 # ============================================================
 @router.post("/create-user", status_code=201)
 def create_user_admin(
-    username: str,
-    email: str,
-    plan: Optional[str] = "free",
+    payload: AdminCreateUser,
     db: Session = Depends(get_db),
 ):
     # normalização
-    username = username.strip().lower()
-    plan = (plan or "free").lower()
+    username = (payload.username or "").strip().lower()
+    email = (payload.email or "").strip().lower()
+    plan = (payload.plan or "free").lower().strip()
 
     # validações básicas
     if not username:
         raise HTTPException(status_code=400, detail="username é obrigatório")
+
+    if not email:
+        raise HTTPException(status_code=400, detail="email é obrigatório")
 
     if plan not in {"free", "pro", "don"}:
         raise HTTPException(

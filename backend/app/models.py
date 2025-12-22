@@ -17,10 +17,8 @@ class BlackLinkUser(Base):
     display_name = Column(String(150), nullable=True)
     bio = Column(Text, nullable=True)
 
-    # identidade para pagamento / contato (opcional)
     email = Column(String(180), nullable=True, unique=True)
 
-    # aparência / perfil (mantém compatível com templates atuais)
     avatar_url = Column(Text, nullable=True)
 
     main_cta_url = Column(Text, nullable=True)
@@ -37,23 +35,22 @@ class BlackLinkUser(Base):
     kwai_url = Column(Text, nullable=True)
     mercadolivre_url = Column(Text, nullable=True)
 
-    # plano atual (o que governa limites)
     plan = Column(String(20), default="free", nullable=False)
-
-    # ciclo de vida (vendável)
-    plan_status = Column(String(20), default="active", nullable=False)  # active | expired | canceled
+    plan_status = Column(String(20), default="active", nullable=False)
     plan_started_at = Column(DateTime, nullable=True)
     plan_expires_at = Column(DateTime, nullable=True)
 
-    # histórico mínimo do último plano pago
     last_paid_plan = Column(String(20), nullable=True)
     last_paid_expires_at = Column(DateTime, nullable=True)
 
-    # ids do MP/assinatura (se usar)
     mp_customer_id = Column(String(120), nullable=True)
     mp_subscription_id = Column(String(120), nullable=True)
 
-    products = relationship("BlackLinkProduct", back_populates="owner", cascade="all, delete-orphan")
+    products = relationship(
+        "BlackLinkProduct",
+        back_populates="owner",
+        cascade="all, delete-orphan"
+    )
 
 
 class BlackLinkProduct(Base):
