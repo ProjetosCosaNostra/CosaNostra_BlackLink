@@ -27,16 +27,11 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 from app.database import engine, ensure_sqlite_schema
 
 # ==================================================
-# SETTINGS
-# ==================================================
-from app.config import settings
-
-# ==================================================
 # FASTAPI APP
 # ==================================================
 app = FastAPI(
     title="CosaNostra BlackLink",
-    version="5.2",
+    version="5.3",
     openapi_url="/openapi.json",
     docs_url="/docs",
     redoc_url=None,
@@ -54,7 +49,7 @@ app.add_middleware(
 )
 
 # ==================================================
-# ROUTERS (IMPORTAÇÃO DIRETA — SEM __init__.py)
+# ROUTERS
 # ==================================================
 import app.routers.auth as auth
 import app.routers.product as product
@@ -65,17 +60,13 @@ import app.routers.panel as panel
 import app.routers.payment as payment
 import app.routers.webhook as webhook
 
-# Router de plano é opcional (não pode derrubar deploy)
 try:
-    import app.routers.plan as plan  # type: ignore
+    import app.routers.plan as plan
     HAS_PLAN = True
 except Exception as e:
     logger.warning(f"⚠️ Router plan indisponível: {e}")
     HAS_PLAN = False
 
-# ==================================================
-# ROUTERS (REGISTRO)
-# ==================================================
 app.include_router(auth.router, tags=["Auth"])
 app.include_router(product.router, tags=["Product"])
 app.include_router(blacklinks.router, tags=["BlackLink"])
@@ -83,12 +74,10 @@ app.include_router(catalog.router, tags=["Catalog"])
 app.include_router(admin.router, tags=["Admin"])
 app.include_router(panel.router, tags=["Panel"])
 app.include_router(payment.router, tags=["Payment"])
+app.include_router(webhook.router, tags=["Webhook"])
 
 if HAS_PLAN:
     app.include_router(plan.router, tags=["Plan"])
-
-# Webhook JÁ tem prefix="/webhook" no próprio router
-app.include_router(webhook.router, tags=["Webhook"])
 
 # ==================================================
 # STARTUP
@@ -96,22 +85,19 @@ app.include_router(webhook.router, tags=["Webhook"])
 @app.on_event("startup")
 def on_startup():
     logger.info("🚀 Iniciando CosaNostra BlackLink")
-    ensure_sqlite_schema(engine)  # 🔥 ESSENCIAL
-    logger.info("✅ Banco de dados validado")
+    ensure_sqlite_schema(engine)
+    logger.info("✅ Banco de dados pronto")
 
 # ==================================================
-# HEALTHCHECK
+# HEALTH
 # ==================================================
-@app.get("/", tags=["Health"])
+@app.get("/")
 def health():
     return {"status": "ok", "service": "blacklink"}
 
 # ==================================================
-# FRONTEND TEMPLATE (opcional)
+# UI
 # ==================================================
 @app.get("/ui", response_class=HTMLResponse)
 def ui_home(request: Request):
-    return templates.TemplateResponse(
-        "user_page.html",
-        {"request": request},
-    )
+    return templates.TemplateResponse("user_page.html", {"request": request})

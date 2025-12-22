@@ -33,23 +33,25 @@ def get_db() -> Generator:
 
 def ensure_sqlite_schema(db_engine) -> None:
     """
-    SQLite: adiciona colunas faltantes sem Alembic (ALTER TABLE ... ADD COLUMN ...).
-    PASSO 3: garante colunas de ciclo de vida do plano.
+    SQLite bootstrap profissional:
+    1) Cria TODAS as tabelas se não existirem
+    2) Aplica ALTER TABLE apenas para colunas novas
     """
+
+    # 🔥 PASSO 1 — CRIA TABELAS (ESSENCIAL)
+    Base.metadata.create_all(bind=db_engine)
+
     if not str(db_engine.url).startswith("sqlite"):
         return
 
     user_cols: Dict[str, str] = {
         "display_name": "VARCHAR(150)",
         "bio": "TEXT",
-
         "email": "VARCHAR(180)",
         "avatar_url": "TEXT",
-
         "main_cta_url": "TEXT",
         "main_cta_label": "TEXT",
         "main_cta_subtitle": "TEXT",
-
         "instagram_url": "TEXT",
         "tiktok_url": "TEXT",
         "youtube_url": "TEXT",
@@ -59,16 +61,12 @@ def ensure_sqlite_schema(db_engine) -> None:
         "facebook_url": "TEXT",
         "kwai_url": "TEXT",
         "mercadolivre_url": "TEXT",
-
         "plan": "VARCHAR(20)",
-
-        # PASSO 3
         "plan_status": "VARCHAR(20)",
         "plan_started_at": "DATETIME",
         "plan_expires_at": "DATETIME",
         "last_paid_plan": "VARCHAR(20)",
         "last_paid_expires_at": "DATETIME",
-
         "mp_customer_id": "VARCHAR(120)",
         "mp_subscription_id": "VARCHAR(120)",
     }
@@ -101,12 +99,16 @@ def ensure_sqlite_schema(db_engine) -> None:
             existing = existing_cols(conn, "blacklink_users")
             for col, coltype in user_cols.items():
                 if col not in existing:
-                    conn.execute(text(f"ALTER TABLE blacklink_users ADD COLUMN {col} {coltype}"))
+                    conn.execute(
+                        text(f"ALTER TABLE blacklink_users ADD COLUMN {col} {coltype}")
+                    )
 
         if table_exists(conn, "blacklink_products"):
             existing = existing_cols(conn, "blacklink_products")
             for col, coltype in product_cols.items():
                 if col not in existing:
-                    conn.execute(text(f"ALTER TABLE blacklink_products ADD COLUMN {col} {coltype}"))
+                    conn.execute(
+                        text(f"ALTER TABLE blacklink_products ADD COLUMN {col} {coltype}")
+                    )
 
         conn.commit()
