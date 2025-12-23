@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 from typing import Optional
 
+import mercadopago
 from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 
@@ -18,14 +20,26 @@ from app.services.plan_catalog import (
 )
 
 # ============================================================
+# BLINDAGEM — MERCADO PAGO SDK
+# ============================================================
+
+MP_ACCESS_TOKEN = (settings.MP_ACCESS_TOKEN or "").strip()
+
+if not MP_ACCESS_TOKEN:
+    raise RuntimeError("❌ MP_ACCESS_TOKEN não definido ou inválido")
+
+sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
+
+# ============================================================
 # ROUTER
 # ============================================================
-router = APIRouter(prefix="/payment", tags=["Payment"])
 
+router = APIRouter(prefix="/payment", tags=["Payment"])
 
 # ============================================================
 # UTIL — aplicar upgrade real de plano
 # ============================================================
+
 def apply_plan_upgrade(
     *,
     user: models.BlackLinkUser,
@@ -34,11 +48,6 @@ def apply_plan_upgrade(
 ) -> models.BlackLinkUser:
     """
     Aplica upgrade real de plano no usuário.
-
-    Regras:
-    - FREE não é vendável
-    - PRO / DON ativam plano com datas
-    - Renovação soma tempo se ainda ativo
     """
 
     plan = get_plan(plan_id)
@@ -48,7 +57,6 @@ def apply_plan_upgrade(
 
     now = datetime.now(timezone.utc)
 
-    # Renovação inteligente
     if (
         user.plan in ("pro", "don")
         and user.plan_status == "active"
@@ -61,12 +69,10 @@ def apply_plan_upgrade(
 
     expires_at = calc_plan_expiry(start_at, months, plan.id)
 
-    # Histórico
     if user.plan in ("pro", "don"):
         user.last_paid_plan = user.plan
         user.last_paid_expires_at = user.plan_expires_at
 
-    # Aplica plano
     user.plan = plan.id
     user.plan_status = "active"
     user.plan_started_at = start_at
@@ -74,25 +80,15 @@ def apply_plan_upgrade(
 
     return user
 
+# ============================================================
+# ENDPOINT — CHECKOUT (Mercado Pago Preference)
+# ============================================================
 
-# ============================================================
-# ENDPOINT 1 — CHECKOUT (Mercado Pago Preference)
-# ============================================================
 @router.post("/checkout")
 def create_checkout_preference(
     payload: PaymentProcessRequest,
     db: Session = Depends(get_db),
 ):
-    """
-    Cria uma PREFERENCE do Mercado Pago.
-    Roda em SANDBOX ou PRODUÇÃO dependendo do token.
-
-    IMPORTANTE:
-    - external_reference precisa ser consistente com o webhook:
-        username:plan:months
-    - notification_url aponta para /webhook/mercadopago (settings.MP_WEBHOOK_URL)
-    """
-
     username = (payload.username or "").strip().lower()
     plan_id = normalize_plan(payload.plan)
     months = payload.months or 1
@@ -120,21 +116,11 @@ def create_checkout_preference(
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-    if not settings.MP_ACCESS_TOKEN:
-        raise HTTPException(
-            status_code=500,
-            detail="Mercado Pago não configurado (MP_ACCESS_TOKEN ausente)",
-        )
-
     if not settings.MP_WEBHOOK_URL:
         raise HTTPException(
             status_code=500,
-            detail="MP_WEBHOOK_URL ausente (notification_url do Mercado Pago)",
+            detail="MP_WEBHOOK_URL não configurado",
         )
-
-    import mercadopago
-
-    sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
 
     unit_price = (plan.price_brl_cents / 100) * months
 
@@ -150,7 +136,6 @@ def create_checkout_preference(
         "payer": {
             "email": payload.email or user.email or "cliente@blacklink.app"
         },
-        # ✅ webhook parseia "username:plan:months"
         "external_reference": f"{user.username}:{plan.id}:{months}",
         "notification_url": settings.MP_WEBHOOK_URL,
         "back_urls": {
@@ -175,35 +160,18 @@ def create_checkout_preference(
         "preference_id": pref["id"],
         "init_point": pref.get("init_point"),
         "sandbox_init_point": pref.get("sandbox_init_point"),
-        # útil para debug:
-        "external_reference": preference_data["external_reference"],
-        "notification_url": preference_data["notification_url"],
     }
 
+# ============================================================
+# ENDPOINT — PROCESSAMENTO (PRODUÇÃO SAFE)
+# ============================================================
 
-# ============================================================
-# ENDPOINT 2 — PROCESSAMENTO (PRODUÇÃO-SAFE) — FALLBACK/ADMIN
-# ============================================================
 @router.post("/process", response_model=PaymentProcessResponse)
 def process_payment(
     payload: PaymentProcessRequest,
     db: Session = Depends(get_db),
-    x_webhook_secret: str | None = Header(default=None),
+    x_webhook_secret: Optional[str] = Header(default=None),
 ):
-    """
-    Processa pagamento aprovado.
-
-    Uso recomendado:
-    - Fallback/admin ou processamento manual controlado.
-
-    Em PRODUÇÃO:
-    - Exige payment_id
-    - Valida pagamento no Mercado Pago
-    - Confere status = approved
-    - Confere external_reference
-    - Impede ativação manual/fake
-    """
-
     username = (payload.username or "").strip().lower()
     plan_id = normalize_plan(payload.plan)
     months = payload.months or 1
@@ -212,7 +180,7 @@ def process_payment(
         raise HTTPException(status_code=400, detail="username é obrigatório")
 
     if months < 1 or months > 24:
-        raise HTTPException(status_code=400, detail="months inválido (1..24)")
+        raise HTTPException(status_code=400, detail="months inválido")
 
     if plan_id == PLAN_FREE:
         raise HTTPException(status_code=400, detail="Plano FREE não é vendável")
@@ -228,50 +196,28 @@ def process_payment(
 
     plan = get_plan(plan_id)
 
-    if not plan.is_sellable:
-        raise HTTPException(status_code=400, detail="Plano inválido")
-
-    # ========================================================
-    # PRODUÇÃO — valida pagamento real
-    # ========================================================
     if settings.MP_ENV == "production":
         if not payload.payment_id:
-            raise HTTPException(
-                status_code=400,
-                detail="payment_id é obrigatório em produção",
-            )
+            raise HTTPException(400, "payment_id obrigatório")
 
-        # Header de segurança opcional
         if settings.MP_WEBHOOK_SECRET:
             if x_webhook_secret != settings.MP_WEBHOOK_SECRET:
-                raise HTTPException(
-                    status_code=403,
-                    detail="Webhook não autorizado",
-                )
+                raise HTTPException(403, "Webhook não autorizado")
 
-        import mercadopago
-
-        sdk = mercadopago.SDK(settings.MP_ACCESS_TOKEN)
         payment = sdk.payment().get(payload.payment_id)
 
         if payment.get("status") != 200:
-            raise HTTPException(400, "Pagamento não encontrado no Mercado Pago")
+            raise HTTPException(400, "Pagamento não encontrado")
 
-        payment_data = payment["response"]
+        data = payment["response"]
 
-        if payment_data.get("status") != "approved":
+        if data.get("status") != "approved":
             raise HTTPException(400, "Pagamento não aprovado")
 
         expected_ref = f"{user.username}:{plan.id}:{months}"
-        if payment_data.get("external_reference") != expected_ref:
-            raise HTTPException(
-                400,
-                "Referência de pagamento inválida",
-            )
+        if data.get("external_reference") != expected_ref:
+            raise HTTPException(400, "external_reference inválida")
 
-    # ========================================================
-    # APLICA PLANO (pagamento aprovado)
-    # ========================================================
     user = apply_plan_upgrade(
         user=user,
         plan_id=plan.id,
