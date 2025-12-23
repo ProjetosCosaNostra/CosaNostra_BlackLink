@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -20,7 +19,7 @@ from app.services.plan_catalog import (
 )
 
 # ============================================================
-# BLINDAGEM — MERCADO PAGO SDK
+# 🔐 BLINDAGEM — MERCADO PAGO SDK
 # ============================================================
 
 MP_ACCESS_TOKEN = (settings.MP_ACCESS_TOKEN or "").strip()
@@ -37,7 +36,7 @@ sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
 router = APIRouter(prefix="/payment", tags=["Payment"])
 
 # ============================================================
-# UTIL — aplicar upgrade real de plano
+# 🔧 UTIL — aplicar upgrade real de plano
 # ============================================================
 
 def apply_plan_upgrade(
@@ -46,10 +45,6 @@ def apply_plan_upgrade(
     plan_id: str,
     months: int,
 ) -> models.BlackLinkUser:
-    """
-    Aplica upgrade real de plano no usuário.
-    """
-
     plan = get_plan(plan_id)
 
     if not plan.is_sellable:
@@ -81,7 +76,7 @@ def apply_plan_upgrade(
     return user
 
 # ============================================================
-# ENDPOINT — CHECKOUT (Mercado Pago Preference)
+# 💳 ENDPOINT — CHECKOUT (Preference Mercado Pago)
 # ============================================================
 
 @router.post("/checkout")
@@ -116,10 +111,17 @@ def create_checkout_preference(
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-    if not settings.MP_WEBHOOK_URL:
+    # 🔴 URLs obrigatórias para Sandbox e Produção
+    if not (
+        settings.PUBLIC_BASE_URL
+        and settings.MP_SUCCESS_URL
+        and settings.MP_FAILURE_URL
+        and settings.MP_PENDING_URL
+        and settings.MP_WEBHOOK_URL
+    ):
         raise HTTPException(
             status_code=500,
-            detail="MP_WEBHOOK_URL não configurado",
+            detail="URLs do Mercado Pago não configuradas corretamente",
         )
 
     unit_price = (plan.price_brl_cents / 100) * months
@@ -163,7 +165,7 @@ def create_checkout_preference(
     }
 
 # ============================================================
-# ENDPOINT — PROCESSAMENTO (PRODUÇÃO SAFE)
+# ✅ ENDPOINT — PROCESSAMENTO MANUAL (fallback / produção)
 # ============================================================
 
 @router.post("/process", response_model=PaymentProcessResponse)
