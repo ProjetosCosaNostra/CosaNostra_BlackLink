@@ -111,17 +111,16 @@ def create_checkout_preference(
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
-    # 🔴 URLs obrigatórias para Sandbox e Produção
+    # ✅ SOMENTE o que o Mercado Pago realmente exige
     if not (
-        settings.PUBLIC_BASE_URL
+        settings.MP_WEBHOOK_URL
         and settings.MP_SUCCESS_URL
         and settings.MP_FAILURE_URL
         and settings.MP_PENDING_URL
-        and settings.MP_WEBHOOK_URL
     ):
         raise HTTPException(
             status_code=500,
-            detail="URLs do Mercado Pago não configuradas corretamente",
+            detail="URLs do Mercado Pago não configuradas",
         )
 
     unit_price = (plan.price_brl_cents / 100) * months
@@ -165,7 +164,7 @@ def create_checkout_preference(
     }
 
 # ============================================================
-# ✅ ENDPOINT — PROCESSAMENTO MANUAL (fallback / produção)
+# ✅ ENDPOINT — PROCESSAMENTO MANUAL (fallback)
 # ============================================================
 
 @router.post("/process", response_model=PaymentProcessResponse)
